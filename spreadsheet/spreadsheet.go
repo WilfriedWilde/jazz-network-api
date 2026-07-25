@@ -6,34 +6,18 @@ import (
 	"log"
 	"os"
 	"strings"
+	"time"
 )
-
-type Organizer struct {
-	Type           string
-	Name           string
-	Country        string
-	City           string
-	Address        string
-	Websites       []string
-	Emails         []string
-	PhoneNumbers   []string
-	ContactPersons []string
-	Schedule       string
-	Notes          string
-	Latitude       float64
-	Longitude      float64
-	Status         bool
-}
 
 func UpdateSpreadSheet() {
 	file, err := os.Open("spreadsheet/jazz_network.csv")
 	if err != nil {
-		log.Printf("error opening jazz_network.csv: %s", err.Error())
+		log.Printf("error opening jazz_network.csv: %s\n", err.Error())
 	}
 
 	records, err := csv.NewReader(file).ReadAll()
 	if err != nil {
-		log.Printf("error reading jazz_network.csv: %s", err.Error())
+		log.Printf("error reading jazz_network.csv: %s\n", err.Error())
 	}
 
 	organizers := make([]Organizer, len(records)-1)
@@ -49,21 +33,40 @@ func UpdateSpreadSheet() {
 		contactPersons := getRowSlice(row[8])
 
 		organizers[rowID] = Organizer{
-			Type:           strings.TrimSpace(row[0]),
-			Name:           strings.TrimSpace(row[1]),
-			Country:        strings.TrimSpace(row[2]),
-			City:           strings.TrimSpace(row[3]),
-			Address:        strings.TrimSpace(row[4]),
+			Type:           strings.TrimSpace(strings.ToLower(row[0])),
+			Name:           strings.TrimSpace(strings.ToLower(row[1])),
+			Country:        strings.TrimSpace(strings.ToLower(row[2])),
+			City:           strings.TrimSpace(strings.ToLower(row[3])),
+			Address:        strings.TrimSpace(strings.ToLower(row[4])),
 			Websites:       websites,
 			Emails:         emails,
 			PhoneNumbers:   phoneNumbers,
 			ContactPersons: contactPersons,
-			Schedule:       strings.TrimSpace(row[9]),
+			Schedule:       strings.TrimSpace(strings.ToLower(row[9])),
 			Notes:          strings.TrimSpace(row[10]),
 		}
 	}
 
-	fmt.Printf("%+v\n", organizers[2])
+	errFile, err := os.OpenFile("log_error.txt", os.O_RDWR|os.O_CREATE|os.O_TRUNC, 0644)
+	if err != nil {
+		log.Printf("error creating/opening log_error.txt: %s\n", err.Error())
+	}
+
+	for i, o := range organizers {
+		err = updateOrganizerData(&o)
+		if err != nil {
+			errorMessage := fmt.Sprintf("error row %d: %s\n", i, err.Error())
+
+			log.Print(errorMessage)
+			errFile.WriteString(errorMessage)
+			time.Sleep(time.Second*1 + time.Millisecond*200)
+
+			continue
+		}
+
+		fmt.Printf("Address: %s\nLat: %f\nLon: %f\n\n", o.Address, o.Latitude, o.Longitude)
+		time.Sleep(time.Second*1 + time.Millisecond*200)
+	}
 }
 
 func getRowSlice(s string) []string {
@@ -71,7 +74,7 @@ func getRowSlice(s string) []string {
 	rowSlice := make([]string, len(split))
 
 	for i := range split {
-		rowSlice[i] = strings.TrimSpace(split[i])
+		rowSlice[i] = strings.TrimSpace(strings.ToLower(split[i]))
 	}
 
 	return rowSlice
