@@ -1,13 +1,18 @@
 package spreadsheet
 
 import (
+	"cmp"
 	"encoding/json"
 	"fmt"
 	"net/http"
 	"net/url"
+	"slices"
 	"strconv"
 	"strings"
 )
+
+var venueType = []string{"music_venue", "restaurant", "hotel", "nightclub", "arts_centre", "theatre", "bar", "pub", "events_venue", "community_centre", "cooperative"}
+var placeTypes = []string{"city", "town", "village", "hamlet", "municipality", "borough", "suburb", "park"}
 
 func updateOrganizerData(organizer *Organizer) error {
 	data, err := getNominatimData(organizer)
@@ -36,19 +41,18 @@ func updateOrganizerData(organizer *Organizer) error {
 func getNominatimData(organizer *Organizer) (NominatimData, error) {
 	// build url query
 	var queryParts []string
+	params := url.Values{}
 
 	switch organizer.Type {
 	case "venue":
 		queryParts = []string{organizer.Name, organizer.City, organizer.Country}
-	case "festival":
-		queryParts = []string{organizer.City, organizer.Country}
 	default:
 		queryParts = []string{organizer.City, organizer.Country}
+		params.Set("featureType", "settlement")
 	}
 
 	searchQuery := strings.Join(queryParts, " ")
 
-	params := url.Values{}
 	params.Set("q", searchQuery)
 	params.Set("format", "json")
 	params.Set("accept-language", "en")
@@ -78,25 +82,39 @@ func getNominatimData(organizer *Organizer) (NominatimData, error) {
 	}
 
 	var nominatimData NominatimData
-	var unknowType string
+	var typeMatches []NominatimData
 
 	if len(geodata) == 0 {
 		return NominatimData{}, fmt.Errorf("no match for %s, %s, %s", organizer.Name, organizer.City, organizer.Country)
 	} else if len(geodata) > 1 { // if multiple results get city or town, else just the single result
 		for _, d := range geodata {
-			if d.Type == "city" || d.Type == "town" {
-				nominatimData = d
-				break
-			} else {
-				unknowType = d.Type
+			switch organizer.Type {
+			case "venue":
+				if slices.Contains(venueType, d.Type) {
+					typeMatches = append(typeMatches, d)
+				}
+			default:
+				if slices.Contains(placeTypes, d.AddressType) {
+					typeMatches = append(typeMatches, d)
+				}
 			}
+
+		}
+
+		// pick type match with highest importance
+		if len(typeMatches) > 0 {
+			slices.SortFunc(typeMatches, func(a, b NominatimData) int {
+				return cmp.Compare(b.Importance, a.Importance)
+			})
+
+			nominatimData = typeMatches[0]
 		}
 	} else {
 		nominatimData = geodata[0]
 	}
 
 	if nominatimData == (NominatimData{}) {
-		return nominatimData, fmt.Errorf("failed to find the correct address type %s for %s, %s, %s", unknowType, organizer.Name, organizer.City, organizer.Country)
+		return nominatimData, fmt.Errorf("failed to find the correct type for %s, %s, %s", organizer.Name, organizer.City, organizer.Country)
 	}
 
 	return nominatimData, nil

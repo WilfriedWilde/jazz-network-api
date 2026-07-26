@@ -1,10 +1,13 @@
 package spreadsheet
 
 import (
+	"bufio"
 	"encoding/csv"
 	"fmt"
 	"log"
 	"os"
+	"slices"
+	"strconv"
 	"strings"
 	"time"
 )
@@ -47,25 +50,68 @@ func UpdateSpreadSheet() {
 		}
 	}
 
-	errFile, err := os.OpenFile("log_error.txt", os.O_RDWR|os.O_CREATE|os.O_TRUNC, 0644)
+	// open/create log files
+	validLog, err := os.OpenFile("spreadsheet/log_valid.txt", os.O_RDWR|os.O_CREATE|os.O_TRUNC, 0644)
 	if err != nil {
-		log.Printf("error creating/opening log_error.txt: %s\n", err.Error())
+		log.Printf("error creating/opening log_valid.txt: %s\n", err.Error())
+	}
+	defer validLog.Close()
+
+	matchLog, err := os.OpenFile("spreadsheet/log_match.txt", os.O_RDWR|os.O_CREATE|os.O_TRUNC, 0644)
+	if err != nil {
+		log.Printf("error creating/opening log_match.txt: %s\n", err.Error())
+	}
+	defer matchLog.Close()
+
+	typeLog, err := os.OpenFile("spreadsheet/log_type.txt", os.O_RDWR|os.O_CREATE|os.O_TRUNC, 0644)
+	if err != nil {
+		log.Printf("error creating/opening log_type.txt: %s\n", err.Error())
+	}
+	defer typeLog.Close()
+
+	// get valid rows
+	validRows := make([]int, 0)
+	scanner := bufio.NewScanner(validLog)
+
+	for scanner.Scan() {
+		line := strings.TrimSpace(scanner.Text())
+		rowID, err := strconv.Atoi(line)
+		if err != nil {
+			log.Println(err)
+		}
+
+		validRows = append(validRows, rowID)
+	}
+	if err := scanner.Err(); err != nil {
+		log.Println(err)
 	}
 
+	// update all organizers
 	for i, o := range organizers {
+		// skip valid row
+		if len(validRows) > 0 && slices.Contains(validRows, i+2) {
+			continue
+		}
+
 		err = updateOrganizerData(&o)
 		if err != nil {
-			errorMessage := fmt.Sprintf("error row %d: %s\n", i, err.Error())
+			errorMessage := fmt.Sprintf("error row %d: %s\n", i+2, err.Error())
+
+			if strings.Contains(errorMessage, "match") {
+				matchLog.WriteString(errorMessage)
+			} else if strings.Contains(errorMessage, "type") {
+				typeLog.WriteString(errorMessage)
+			}
 
 			log.Print(errorMessage)
-			errFile.WriteString(errorMessage)
-			time.Sleep(time.Second*1 + time.Millisecond*200)
+			time.Sleep(time.Second*1 + time.Millisecond*100)
 
 			continue
 		}
 
+		validLog.WriteString(strconv.Itoa(i+2) + "\n")
 		fmt.Printf("Address: %s\nLat: %f\nLon: %f\n\n", o.Address, o.Latitude, o.Longitude)
-		time.Sleep(time.Second*1 + time.Millisecond*200)
+		time.Sleep(time.Second*1 + time.Millisecond*100)
 	}
 }
 
