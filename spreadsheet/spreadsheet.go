@@ -51,7 +51,7 @@ func UpdateSpreadSheet() {
 	}
 
 	// open/create log files
-	validLog, err := os.OpenFile("spreadsheet/log_valid.txt", os.O_RDWR|os.O_CREATE|os.O_TRUNC, 0644)
+	validLog, err := os.OpenFile("spreadsheet/log_valid.txt", os.O_RDWR|os.O_CREATE|os.O_APPEND, 0644)
 	if err != nil {
 		log.Printf("error creating/opening log_valid.txt: %s\n", err.Error())
 	}
@@ -86,6 +86,10 @@ func UpdateSpreadSheet() {
 		log.Println(err)
 	}
 
+	fmt.Println(validRows)
+	if len(validRows) == 0 {
+		return
+	}
 	// update all organizers
 	for i, o := range organizers {
 		// skip valid row

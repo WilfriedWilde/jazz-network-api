@@ -1,6 +1,5 @@
 error row 12: no match for centrum voor jonge kunst, gent, belgium
 error row 14: no match for ham sessions, gent, belgium
-error row 16: no match for jacques pelzer, thier-�-li�ge, belgium
 error row 17: no match for jazzbaar, merelbeke, belgium
 error row 18: no match for jazz living room, brussels, belgium
 error row 19: no match for jazzmadd - theater pact, aalst, belgium
@@ -9,86 +8,65 @@ error row 22: no match for kaffee damast, kortrijk, belgium
 error row 24: no match for l'espace toots, evere, belgium
 error row 25: no match for odnar jazz diner, oudenaarde, belgium
 error row 26: no match for sounds jazz club, brussels, belgium
-error row 28: no match for th��tre marni, ixelles, belgium
 error row 33: no match for de verloren kost, ghent, belgium
 error row 39: no match for istrian national theatre, pula, croatia
 error row 46: no match for antibes tourism office, antibes, france
-error row 54: no match for zanzi bar, s�te, france
-error row 55: no match for casino barriere, saint-rapha�l, france
-error row 56: no match for m�diath�que, juan-les-pins, france
+error row 55: no match for casino barriere, saint-raphaël, france
 error row 57: no match for le 38 riv, paris, france
 error row 59: no match for b-flat club, berlin, germany
-error row 63: no match for bischofsm�hle, hildesheim, germany
-error row 66: no match for burgjazz, l�dinghausen, germany
 error row 71: no match for donau115, berlin, germany
 error row 72: no match for rheingau musik festival, eltville im rheingau, germany
-error row 74: no match for gustav l�bcke museum, hamm, germany
 error row 79: no match for jammbar, lahr, germany
 error row 80: no match for jazz in der mitte, reutlingen, germany
 error row 82: no match for jazzbaltica festival, schloss salzau, germany
 error row 83: no match for jazzclub heidelberg, heidelberg, germany
 error row 84: no match for jazzclub singen, singen, germany
 error row 85: no match for jazzclub regensburg, regensburg, germany
-error row 87: no match for jazzfestival g�ttingen, g�ttingen, germany
-error row 88: no match for jazz schmiede, d�sseldorf, germany
-error row 90: no match for keller z87, w�rzburg, germany
 error row 91: no match for heimathirsch (jazzzeit im), cologne, germany
-error row 93: no match for kresslesm�hle, augsburg, germany
 error row 94: no match for kultur und tagungshaus rauenthal, eltville im rheingau, germany
-error row 95: no match for kulturo r�mmingen, r�mmingen, germany
+error row 95: no match for kulturo rümmingen, rümmingen, germany
 error row 99: no match for montags jazz, leipzig, germany
 error row 100: no match for musig im pflegidach, muri, germany
 error row 101: no match for nica jazzclub, hamburg, germany
 error row 103: no match for oetkerhalle, bielefeld, germany
-error row 107: no match for schottm�llers, bernau, germany
-error row 110: no match for theaterst�bchen, kassel, germany
+error row 107: no match for schottmüllers, bernau, germany
 error row 114: no match for music theatre adams, milos, greece
 error row 118: no match for cotton jazz club, ascoli, italy
 error row 131: no match for aundo hall, hakodate, hokkaido, japan
 error row 133: no match for live spot rag, kyoto, japan
 error row 134: no match for musoukan, eniwa, hokkaido, japan
-error row 140: no match for lumi�re jazz nights, maastricht, netherlands
+error row 140: no match for lumière jazz nights, maastricht, netherlands
 error row 141: no match for podium jin, nijmegen, netherlands
 error row 144: no match for the jazz corner, rotterdam, netherlands
 error row 147: no match for jazz podium de tor, enschede, netherlands
-error row 148: no match for 058 jazzcaf�, leeuwarden, netherlands
+error row 148: no match for 058 jazzcafé, leeuwarden, netherlands
 error row 151: no match for the pop-up jazz club, maastricht, netherlands
-error row 160: no match for tarnowskie centrum kultury, tarn�w, poland
-error row 165: no match for the jazz cave festival, r�mnicu v�lcea, romania
 error row 168: no match for glen miller cafe, stockholm, sweden
-error row 169: no match for br�tz, gothenburg, sweden
+error row 169: no match for brötz, gothenburg, sweden
 error row 170: no match for unity jazz club, gothenburg, sweden
-error row 171: no match for nefertiti, g�teborg, sweden
-error row 173: no match for amr, gen�ve, switzerland
 error row 177: no match for beclys, basel, switzerland
 error row 181: no match for einsiedler dorfkeller, einsiedeln, switzerland
 error row 183: no match for ema ecole des musiques actuelles, geneva, switzerland
 error row 184: no match for esse music bar, winterthur, switzerland
-error row 186: no match for festsaal im seehof, k�snacht, switzerland
-error row 191: no match for iseb�hnli, baden, switzerland
-error row 192: no match for jazz club b�lach, b�lach, switzerland
+error row 186: no match for festsaal im seehof, küsnacht, switzerland
+error row 192: no match for jazz club bülach, bülach, switzerland
 error row 193: no match for jazz cat, giubiasco, switzerland
 error row 194: no match for jazzclub q4, rheinfelden, switzerland
 error row 195: no match for jazz in sarnen, sarnen, switzerland
 error row 197: no match for jazz in bess, lugano, switzerland
-error row 199: no match for jazz in witikon, z�rich, switzerland
+error row 199: no match for jazz in witikon, zürich, switzerland
 error row 200: no match for jazzclub uster, uster, switzerland
 error row 202: no match for jumeaux jazzclub, lausanne, switzerland
-error row 204: no match for klavierwerkstatt ren� waldhauser, liestal, switzerland
+error row 204: no match for klavierwerkstatt rené waldhauser, liestal, switzerland
 error row 206: no match for kulturclub lebewohlfabrik, zurich, switzerland
 error row 210: no match for la tour de rive, la neuveville, switzerland
 error row 211: no match for lemura tape session, montagnola, switzerland
 error row 213: no match for mittagsmusik am gleis 1, brugg, switzerland
-error row 218: no match for musi�, del�mont, switzerland
-error row 219: no match for m�hle hunziken, bern, switzerland
-error row 221: no match for raum 236, z�rich, switzerland
-error row 223: no match for ren�e, basel, switzerland
+error row 218: no match for musiù, delémont, switzerland
 error row 225: no match for schaffausen jazz festival, schaffausen, switzerland
 error row 226: no match for jazzchurl, chur, switzerland
 error row 227: no match for streming hall handmade music, chur, switzerland
 error row 232: no match for villa irniger, basel, switzerland
 error row 233: no match for wach am bach, basel, switzerland
-error row 234: no match for wasserkirche, z�rich, switzerland
-error row 235: no match for 5�me etage, bern, switzerland
 error row 238: no match for jazz at the blue lamp, aberdeen, united kingdom
 error row 239: no match for jazz cafe posk, london, united kingdom
