@@ -1,24 +1,3 @@
-error row 12: no match for centrum voor jonge kunst, gent, belgium
-error row 14: no match for ham sessions, gent, belgium
-error row 17: no match for jazzbaar, merelbeke, belgium
-error row 18: no match for jazz living room, brussels, belgium
-error row 19: no match for jazzmadd - theater pact, aalst, belgium
-error row 20: no match for jazzzolder, mechelen, belgium
-error row 22: no match for kaffee damast, kortrijk, belgium
-error row 24: no match for l'espace toots, evere, belgium
-error row 25: no match for odnar jazz diner, oudenaarde, belgium
-error row 26: no match for sounds jazz club, brussels, belgium
-error row 33: no match for de verloren kost, ghent, belgium
-error row 39: no match for istrian national theatre, pula, croatia
-error row 46: no match for antibes tourism office, antibes, france
-error row 55: no match for casino barriere, saint-raphaël, france
-error row 57: no match for le 38 riv, paris, france
-error row 59: no match for b-flat club, berlin, germany
-error row 71: no match for donau115, berlin, germany
-error row 72: no match for rheingau musik festival, eltville im rheingau, germany
-error row 79: no match for jammbar, lahr, germany
-error row 80: no match for jazz in der mitte, reutlingen, germany
-error row 82: no match for jazzbaltica festival, schloss salzau, germany
 error row 83: no match for jazzclub heidelberg, heidelberg, germany
 error row 84: no match for jazzclub singen, singen, germany
 error row 85: no match for jazzclub regensburg, regensburg, germany
