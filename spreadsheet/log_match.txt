@@ -1,5 +1,3 @@
-error row 83: no match for jazzclub heidelberg, heidelberg, germany
-error row 84: no match for jazzclub singen, singen, germany
 error row 85: no match for jazzclub regensburg, regensburg, germany
 error row 91: no match for heimathirsch (jazzzeit im), cologne, germany
 error row 94: no match for kultur und tagungshaus rauenthal, eltville im rheingau, germany
