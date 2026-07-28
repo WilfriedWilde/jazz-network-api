@@ -1,8 +1,8 @@
-amenity=arts_centre
-name=Artistieke Projectruimte Postx
-addr:street=Van Goethemstraat
-addr:housenumber=33
-addr:postcode=9820
-addr:city=Merelbeke-Melle
-website=https://www.postx.be/
+amenity=
+name=
+addr:street=
+addr:housenumber=
+addr:postcode=
+addr:city=
+website=
 music:genre=jazz

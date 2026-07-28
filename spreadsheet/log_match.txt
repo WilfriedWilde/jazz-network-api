@@ -1,39 +1,3 @@
-error row 85: no match for jazzclub regensburg, regensburg, germany
-error row 91: no match for heimathirsch (jazzzeit im), cologne, germany
-error row 94: no match for kultur und tagungshaus rauenthal, eltville im rheingau, germany
-error row 95: no match for kulturo rümmingen, rümmingen, germany
-error row 99: no match for montags jazz, leipzig, germany
-error row 100: no match for musig im pflegidach, muri, germany
-error row 101: no match for nica jazzclub, hamburg, germany
-error row 103: no match for oetkerhalle, bielefeld, germany
-error row 107: no match for schottmüllers, bernau, germany
-error row 114: no match for music theatre adams, milos, greece
-error row 118: no match for cotton jazz club, ascoli, italy
-error row 131: no match for aundo hall, hakodate, hokkaido, japan
-error row 133: no match for live spot rag, kyoto, japan
-error row 134: no match for musoukan, eniwa, hokkaido, japan
-error row 140: no match for lumière jazz nights, maastricht, netherlands
-error row 141: no match for podium jin, nijmegen, netherlands
-error row 144: no match for the jazz corner, rotterdam, netherlands
-error row 147: no match for jazz podium de tor, enschede, netherlands
-error row 148: no match for 058 jazzcafé, leeuwarden, netherlands
-error row 151: no match for the pop-up jazz club, maastricht, netherlands
-error row 168: no match for glen miller cafe, stockholm, sweden
-error row 169: no match for brötz, gothenburg, sweden
-error row 170: no match for unity jazz club, gothenburg, sweden
-error row 177: no match for beclys, basel, switzerland
-error row 181: no match for einsiedler dorfkeller, einsiedeln, switzerland
-error row 183: no match for ema ecole des musiques actuelles, geneva, switzerland
-error row 184: no match for esse music bar, winterthur, switzerland
-error row 186: no match for festsaal im seehof, küsnacht, switzerland
-error row 192: no match for jazz club bülach, bülach, switzerland
-error row 193: no match for jazz cat, giubiasco, switzerland
-error row 194: no match for jazzclub q4, rheinfelden, switzerland
-error row 195: no match for jazz in sarnen, sarnen, switzerland
-error row 197: no match for jazz in bess, lugano, switzerland
-error row 199: no match for jazz in witikon, zürich, switzerland
-error row 200: no match for jazzclub uster, uster, switzerland
-error row 202: no match for jumeaux jazzclub, lausanne, switzerland
 error row 204: no match for klavierwerkstatt rené waldhauser, liestal, switzerland
 error row 206: no match for kulturclub lebewohlfabrik, zurich, switzerland
 error row 210: no match for la tour de rive, la neuveville, switzerland
