@@ -59,7 +59,9 @@ func UpdateSpreadSheet() {
 
 	writer := csv.NewWriter(outputFile)
 	headers := append(records[0], "latitude", "longitude", "status")
-	writer.Write(headers)
+	if err := writer.Write(headers); err != nil {
+		log.Printf("error writing headers to output file: %s", err)
+	}
 
 	// open/create log files
 	validLog, err := os.OpenFile("spreadsheet/log_valid.txt", os.O_RDWR|os.O_CREATE|os.O_APPEND, 0644)
@@ -147,7 +149,9 @@ func UpdateSpreadSheet() {
 			strconv.FormatFloat(o.Longitude, 'g', -1, 64),
 			strconv.FormatBool(o.Status),
 		}
-		writer.Write(newRecord)
+		if err := writer.Write(newRecord); err != nil {
+			log.Printf("error writing new record to output file: %s", err)
+		}
 
 		time.Sleep(time.Second*1 + time.Millisecond*100)
 	}
