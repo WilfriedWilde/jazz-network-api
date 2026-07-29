@@ -17,6 +17,6 @@ func main() {
 	defer db.Close()
 
 	if err = r.CreateTables(db); err != nil {
-
+		log.Fatal(err)
 	}
 }
