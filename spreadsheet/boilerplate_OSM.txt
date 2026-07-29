@@ -1,0 +1,8 @@
+amenity=
+name=
+addr:street=
+addr:housenumber=
+addr:postcode=
+addr:city=
+website=
+music:genre=jazz
