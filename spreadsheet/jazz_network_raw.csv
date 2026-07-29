@@ -94,7 +94,6 @@ venue,Kulturzentrum Linse,Germany,Weingarten,,https://kulturzentrum-linse.de/kue
 venue,Leise am Markt,Germany,Coburg,,https://www.leise-am-markt.de/anfrage/kuenstleranfrage/,,,,,
 venue,Loch,Germany,Wuppertal,,,booking@loch-wuppertal.de,,Maik Ollhoff,,Wednesday jazz club
 venue,Montagsjazz im Laden auf Zeit,Germany,Leipzig,,,vincent.meissner2@gmail.com,,,,"""Montagsjazz im Laden auf Zeit"" is a weekly event series at the  ""theaterPACK"" in Leipzig, with a programmatic focus on jazz and improvised music."
-venue,Musig im Pflegidach,Germany,Muri,,,info@murikultur.ch,,,Sunday,
 venue,Nica Jazz club,Germany,Hamburg,,,hello@nica-jazzclub.de,,,,
 venue,Nikolaisaal,Germany,Potsdam,,,service@nikolaisaal.de; duehn@nikolaisaal.de,,Michael Dühn,,
 venue,Oma Doris,Germany,Dortmund,,,,,,,Wilfried said this is not…
@@ -132,7 +131,6 @@ Venue,Bird,Netherlands,Rotterdam,,https://bird-rotterdam.nl/,play@bird-rotterdam
 Organization,Stichting Jazz in Groningen,Netherlands,Groningen,,https://stichtingjazzingroningen.nl/,info@stichtingjazzingroningen.nl,,,,
 Organization,Jazz Maastricht,Netherlands,Maastricht,,https://www.jazzmaastricht.com/,bestuur@jazzmaastricht.com; peter@jazzmaastricht.com; info@jazzmaastricht.com,,Peter de Boer,,
 Venue,Jazzpodium de Tor,Netherlands,Enschede,,https://www.jazzpodiumdetor.nl/; https://www.jazzpodiumdetor.nl/torcontact/contactformulier/,,,,,contact form
-Venue,058 Jazzcafé,Netherlands,Leeuwarden,,https://058jazz.nl/,info@058jazz.nl,,,,
 Venue,Pletterij,Netherlands,Haarlem,,https://pletterij.nl/,arno@pletterij.nl; info@pletterij.nl,,Arno Duivestein,,täällä soitettiin Jonathan Bäckströmin kanssa
 Venue,Bimhuis,Netherlands,Amsterdam,,https://www.bimhuis.nl/,booking@bimhuis.nl,,,Tuesday,Tänne pitää kuulemma kirjottaa monta kertaa
 Venue,The Pop-Up Jazzclub,Netherlands,Maastricht,,,info@popupjazzclub.nl; info@theateraanhetvrijthof.nl,,,,"Once a month, Jazz Maastricht, in collaboration with Theater aan het Vrijthof, transforms the foyer and theatre hall of Kumulus into a real jazz club. "
@@ -156,6 +154,7 @@ Venue,Glenn Miller Café,Sweden,Stockholm,,,,,,,"you have to send a text message
 Venue,BrÖtz,Sweden,Gothenburg,,,booking@brotznow.se,,,,
 Venue,Unity Jazz,Sweden,Gothenburg,,,INFO@UNITYJAZZ.SE,,,,
 Venue,Nefertiti,Sweden,Göteborg,,,mattias@nefertiti.se; andreas.romano.schalck@gmail.com,,Mattias Lundin – Artistbokningar/design; Andreas Romano – Artistbokningar (Jazz/Hiphop/Soul/Global),,
+venue,Musig im Pflegidach,Switzerland,Muri,,,info@murikultur.ch,,,Sunday,
 Venue,Alter Zoll,Switzerland,Basel,,,info@alterzoll.ch / peter@lottnermusik.ch,,Peter Lottner,,
 Venue,AMR,Switzerland,Genève,"10, rue des Alpes / 1201 Genève/ CH",,concerts@amr-geneve.ch,,Brooks Giger (Secrétaire à la programmation),,
 Venue,Atlantis,Switzerland,Basel,,,alessandro.zarola@atlantis-basel.ch,,,,
@@ -175,7 +174,7 @@ Venue,Heilsarmee Factory,Switzerland,Luzern,,,luzern@heilsarmee.ch / andreas.fuh
 Festival,Internationales Jazzfestival Bern,Switzerland,Bern,,,info@jazzfestivalbern.ch,,Benny Zurbrügg,,
 Venue,Isebähnli,Switzerland,Baden,,,booking@jazzinbaden.ch,,Paul Tantanini,,
 Venue,Jazzclub Bülach Paul Tantanini,Switzerland,Bülach,,,jazzbuelach@bluewin.ch / engagement@jazzbuelach.ch,,Paul Tantanini,,
-Venue,Jazz Cat,Switzerland,Giubiasco,,,info@jazzcatclub.ch,,,,
+Venue,Jazz Cat Club,Switzerland,Ascona,,,info@jazzcatclub.ch,,,,
 Venue,Jazzclub Q4,Switzerland,Rheinfelden,,,gig@jazzclubq4.ch / info@jazzclubq4.ch,,,,
 Festival,Jazz Festivals Bern,Switzerland,Bern,,,,,,info,
 Venue,Jazz in Bess,Switzerland,Lugano,,,booking@jazzinbess.ch,,,,
@@ -205,7 +204,7 @@ Venue,Raum 236,Switzerland,Zürich,,,info@raum236.ch,,,,often with free admissio
 Venue,Hotel Reine Victoria,Switzerland,St. Moritz,,,info@laudinella.ch,,,,
 Venue,Renée,Switzerland,Basel,,,,,,,
 Venue,Schall und Rauch Bar,Switzerland,Basel,,,musik@schallundrauchbar.ch / info@schallundrauchbar.ch,,,,try again
-Festival,Schaffausen Jazz Festival,Switzerland,Schaffausen,,https://www.jazzfestival.ch/#uberuns/,,,,HAE HEINÄ-ELOKUUSSA!,Tähän aukeaa onlinehakemus heinä-elokuussa tohon nettisivuun.
+Festival,Schaffhausen Jazz Festival,Switzerland,Schaffhausen,,https://www.jazzfestival.ch/#uberuns/,,,,HAE HEINÄ-ELOKUUSSA!,Tähän aukeaa onlinehakemus heinä-elokuussa tohon nettisivuun.
 Festival,JazzChurl Festival,Switzerland,Chur,,,booking@jazzchur.ch,,,,"Apart from the festival, also holds a serie of jazz concerts in various locations in Chur and Graubünden."
 Venue,Handmade Music,Switzerland,Chur,,,mail@handmade-music.ch,+41 81 250 79 53,,,Holds serie of live streamed concerts
 Venue,Studio Foce,Switzerland,Lugano,,,eventi@lugano.ch / info.foce@lugano.ch,,,,
