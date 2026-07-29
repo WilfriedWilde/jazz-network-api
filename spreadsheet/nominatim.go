@@ -30,7 +30,10 @@ func updateOrganizerData(organizer *Organizer) error {
 		return err
 	}
 
-	organizer.Name = data.Name
+	if organizer.Type == "venue" {
+		organizer.Name = data.Name
+	}
+
 	organizer.Address = data.Address
 	organizer.Latitude = lat
 	organizer.Longitude = lon

@@ -13,14 +13,15 @@ import (
 )
 
 func UpdateSpreadSheet() {
-	file, err := os.Open("spreadsheet/jazz_network.csv")
+	// open, read and store records store raw csv
+	rawFile, err := os.Open("spreadsheet/jazz_network_raw.csv")
 	if err != nil {
-		log.Printf("error opening jazz_network.csv: %s\n", err.Error())
+		log.Printf("error opening jazz_network_raw.csv: %s\n", err.Error())
 	}
 
-	records, err := csv.NewReader(file).ReadAll()
+	records, err := csv.NewReader(rawFile).ReadAll()
 	if err != nil {
-		log.Printf("error reading jazz_network.csv: %s\n", err.Error())
+		log.Printf("error reading jazz_network_raw.csv: %s\n", err.Error())
 	}
 
 	organizers := make([]Organizer, len(records)-1)
@@ -49,6 +50,16 @@ func UpdateSpreadSheet() {
 			Notes:          strings.TrimSpace(row[10]),
 		}
 	}
+
+	// open/create output csv
+	outputFile, err := os.OpenFile("spreadsheet/jazz_network.csv", os.O_RDWR|os.O_CREATE|os.O_APPEND, 0644)
+	if err != nil {
+		log.Printf("error creating/opening jazz_network.csv: %s\n", err.Error())
+	}
+
+	writer := csv.NewWriter(outputFile)
+	headers := append(records[0], "latitude", "longitude", "status")
+	writer.Write(headers)
 
 	// open/create log files
 	validLog, err := os.OpenFile("spreadsheet/log_valid.txt", os.O_RDWR|os.O_CREATE|os.O_APPEND, 0644)
@@ -92,10 +103,10 @@ func UpdateSpreadSheet() {
 	}
 	// update all organizers
 	for i, o := range organizers {
-		// skip valid row
-		if len(validRows) > 0 && slices.Contains(validRows, i+2) {
-			continue
-		}
+		// // skip valid row
+		// if len(validRows) > 0 && slices.Contains(validRows, i+2) {
+		// 	continue
+		// }
 
 		err = updateOrganizerData(&o)
 		if err != nil {
@@ -113,9 +124,38 @@ func UpdateSpreadSheet() {
 			continue
 		}
 
-		validLog.WriteString(strconv.Itoa(i+2) + "\n")
-		fmt.Printf("Address: %s\nLat: %f\nLon: %f\n\n", o.Address, o.Latitude, o.Longitude)
+		if !slices.Contains(validRows, i+2) {
+			validLog.WriteString(strconv.Itoa(i+2) + "\n")
+		}
+
+		fmt.Printf("Name: %s\nAddress: %s\nLat: %f\nLon: %f\n\n", o.Name, o.Address, o.Latitude, o.Longitude)
+
+		// write new record to output file
+		newRecord := []string{
+			o.Type,
+			o.Name,
+			o.Country,
+			o.City,
+			o.Address,
+			strings.Join(o.Websites, ";"),
+			strings.Join(o.Emails, ";"),
+			strings.Join(o.PhoneNumbers, ";"),
+			strings.Join(o.ContactPersons, ";"),
+			o.Schedule,
+			o.Notes,
+			strconv.FormatFloat(o.Latitude, 'g', -1, 64),
+			strconv.FormatFloat(o.Longitude, 'g', -1, 64),
+			strconv.FormatBool(o.Status),
+		}
+		writer.Write(newRecord)
+
 		time.Sleep(time.Second*1 + time.Millisecond*100)
+	}
+
+	writer.Flush()
+
+	if err := writer.Error(); err != nil {
+		log.Printf("error writing to jazz_network.csv: %s", err.Error())
 	}
 }
 
