@@ -9,7 +9,7 @@ import (
 	"strings"
 )
 
-const organizerTableStatement = `
+var organizerTableStatement = `
 	CREATE TABLE IF NOT EXISTS organizers (
 		id INTEGER PRIMARY KEY,
 		type TEXT NOT NULL,
