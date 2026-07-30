@@ -9,14 +9,11 @@ import (
 func main() {
 	//s.UpdateSpreadSheet()
 
-	// create/open database
+	// init database
 	db, err := r.InitDB()
 	if err != nil {
-		log.Print(err)
+		log.Fatal(err)
 	}
 	defer db.Close()
 
-	if err = r.CreateTables(db); err != nil {
-		log.Fatal(err)
-	}
 }

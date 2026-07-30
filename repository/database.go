@@ -4,12 +4,13 @@ import (
 	"database/sql"
 	"errors"
 	"fmt"
-
 	"log"
+
+	_ "github.com/mattn/go-sqlite3"
 )
 
 func InitDB() (*sql.DB, error) {
-	db, err := sql.Open("sqlite3", "./jazznetwork.db")
+	db, err := sql.Open("sqlite3", "./jazznetwork.db?_foreign_keys=on")
 	if err != nil {
 		return nil, fmt.Errorf("error creating/opening jazznetwork.db: %s", err.Error())
 	}
@@ -23,6 +24,10 @@ func InitDB() (*sql.DB, error) {
 
 	fmt.Println(sqliteVersion)
 
+	if err := CreateTables(db); err != nil {
+		return nil, err
+	}
+
 	return db, nil
 }
 
@@ -33,7 +38,7 @@ func CreateTables(db *sql.DB) error {
 		"organizers": `
 			CREATE TABLE IF NOT EXISTS organizers (
 				id INTEGER PRIMARY KEY,
-				userID INTEGER,
+				user_id INTEGER REFERENCES users(id),
 				type TEXT NOT NULL,
 				name TEXT NOT NULL,
 				country TEXT NOT NULL,
@@ -46,32 +51,36 @@ func CreateTables(db *sql.DB) error {
 				schedule TEXT,
 				notes TEXT,
 				latitude REAL,
-				longitude REAL,
-				status TEXT DEFAULT 'not contacted'
+				longitude REAL
 			);`,
-		"statuses": `
-			CREATE TABLE IF NOT EXISTS statuses (
+		"organizer contacts": `
+			CREATE TABLE IF NOT EXISTS organizer_contacts (
 				id INTEGER PRIMARY KEY,
-				userID INTEGER,
-				organizerID INTEGER,
-				tourID INTEGER,
-				contacted_in_person BOOLEAN,
-				contacted_phone BOOLEAN,
-				contacted_email BOOLEAN,
-				timestamp DATETIME
+				user_id INTEGER REFERENCES users(id),
+				organizer_id INTEGER REFERENCES organizers(id),
+				method TEXT NOT NULL CHECK (method IN ('email', 'phone', 'in_person')),
+				status TEXT CHECK (status IN ('not_tried', 'contacted', 'confirmed', 'declined')),
+				last_attempted_at TEXT,
+				notes TEXT
+			);`,
+		"organizer notes": `
+			CREATE TABLE IF NOT EXISTS organizer_notes (
+				id INTEGER PRIMARY KEY,
+				user_id INTEGER REFERENCES users(id),
+				organizer_id INTEGER REFERENCES organizers(id),
+				body TEXT NOT NULL,
+				created_at TEXT
 			);`,
 		"users": `
 			CREATE TABLE IF NOT EXISTS users (
 				id INTEGER PRIMARY KEY,
-				tourID INTEGER,
-				name TEXT NOT NULL
+				full_name TEXT NOT NULL
 			);`,
 		"tours": `
 			CREATE TABLE IF NOT EXISTS tours (
 				id INTEGER PRIMARY KEY,
-				userID INTEGER,
+				user_id INTEGER REFERENCES users(id),
 				name TEXT NOT NULL
-				FOREIGN KEY (userdID) REFERENCES users(id)
 		);`,
 	}
 
