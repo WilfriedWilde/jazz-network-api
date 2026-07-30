@@ -3,14 +3,28 @@ package repository
 import (
 	"database/sql"
 	"fmt"
-	s "jazz-network-api/spreadsheet"
 	"strings"
 )
+
+type Organizer struct {
+	Type           string
+	Name           string
+	Country        string
+	City           string
+	Address        string
+	Websites       []string
+	Emails         []string
+	PhoneNumbers   []string
+	ContactPersons []string
+	Schedule       string
+	Notes          string
+	Latitude       float64
+	Longitude      float64
+}
 
 const organizerTableStatement = `
 	CREATE TABLE IF NOT EXISTS organizers (
 		id INTEGER PRIMARY KEY,
-		user_id INTEGER REFERENCES users(id),
 		type TEXT NOT NULL,
 		name TEXT NOT NULL,
 		country TEXT NOT NULL,
@@ -26,7 +40,7 @@ const organizerTableStatement = `
 		longitude REAL
 );`
 
-func CreateOrganizer(db *sql.DB, o s.Organizer) error {
+func CreateOrganizer(db *sql.DB, o Organizer) error {
 	_, err := db.Exec(`
 		INSERT INTO organizers (type, name, country, city, address, websites, emails, phone_numbers, contact_persons, schedule, notes, latitude, longitude) 
 		VALUES (?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?)`,

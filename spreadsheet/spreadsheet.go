@@ -4,6 +4,7 @@ import (
 	"bufio"
 	"encoding/csv"
 	"fmt"
+	r "jazz-network-api/repository"
 	"log"
 	"os"
 	"slices"
@@ -24,7 +25,7 @@ func UpdateSpreadSheet() {
 		log.Printf("error reading jazz_network_raw.csv: %s\n", err.Error())
 	}
 
-	organizers := make([]Organizer, len(records)-1)
+	organizers := make([]r.Organizer, len(records)-1)
 
 	for rowID, row := range records[1:] {
 		if row[3] == "" {
@@ -36,7 +37,7 @@ func UpdateSpreadSheet() {
 		phoneNumbers := getRowSlice(row[7])
 		contactPersons := getRowSlice(row[8])
 
-		organizers[rowID] = Organizer{
+		organizers[rowID] = r.Organizer{
 			Type:           strings.TrimSpace(strings.ToLower(row[0])),
 			Name:           strings.TrimSpace(strings.ToLower(row[1])),
 			Country:        strings.TrimSpace(strings.ToLower(row[2])),

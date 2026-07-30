@@ -40,6 +40,7 @@ func CreateTables(db *sql.DB) error {
 		"organizer notes":    notesTableStatement,
 		"users":              usersTableStatement,
 		"tours":              toursTableStatement,
+		"tour stops":         stopsTableStatement,
 	}
 
 	for name, statement := range tablesStatements {

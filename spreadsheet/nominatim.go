@@ -4,6 +4,7 @@ import (
 	"cmp"
 	"encoding/json"
 	"fmt"
+	r "jazz-network-api/repository"
 	"net/http"
 	"net/url"
 	"slices"
@@ -14,7 +15,7 @@ import (
 var venueType = []string{"music_venue", "restaurant", "hotel", "nightclub", "arts_centre", "theatre", "bar", "pub", "events_venue", "community_centre", "cooperative"}
 var placeTypes = []string{"city", "town", "village", "hamlet", "municipality", "borough", "suburb", "park"}
 
-func updateOrganizerData(organizer *Organizer) error {
+func updateOrganizerData(organizer *r.Organizer) error {
 	data, err := getNominatimData(organizer)
 	if err != nil {
 		return err
@@ -41,7 +42,7 @@ func updateOrganizerData(organizer *Organizer) error {
 	return nil
 }
 
-func getNominatimData(organizer *Organizer) (NominatimData, error) {
+func getNominatimData(organizer *r.Organizer) (NominatimData, error) {
 	// build url query
 	var queryParts []string
 	params := url.Values{}
