@@ -53,7 +53,7 @@ func ReadOrganizer(db *sql.DB, selectOpts Select) (*sql.Rows, error) {
 }
 
 func GetOrganizers() ([]Organizer, error) {
-	file, err := os.Open("repository/jazz_network.csv")
+	file, err := os.Open("spreadsheet/jazz_network.csv")
 	if err != nil {
 		return nil, fmt.Errorf("error opening jazz_network.csv: %s\n", err.Error())
 	}
@@ -75,7 +75,7 @@ func GetOrganizers() ([]Organizer, error) {
 		if err != nil {
 			return nil, fmt.Errorf("error parsing latitude: %s\n", err.Error())
 		}
-		longitude, err := strconv.ParseFloat(row[11], 64)
+		longitude, err := strconv.ParseFloat(row[12], 64)
 		if err != nil {
 			return nil, fmt.Errorf("error parsing longitude: %s\n", err.Error())
 		}
