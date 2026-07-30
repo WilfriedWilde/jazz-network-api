@@ -6,22 +6,6 @@ import (
 	"strings"
 )
 
-type Organizer struct {
-	Type           string
-	Name           string
-	Country        string
-	City           string
-	Address        string
-	Websites       []string
-	Emails         []string
-	PhoneNumbers   []string
-	ContactPersons []string
-	Schedule       string
-	Notes          string
-	Latitude       float64
-	Longitude      float64
-}
-
 const organizerTableStatement = `
 	CREATE TABLE IF NOT EXISTS organizers (
 		id INTEGER PRIMARY KEY,
@@ -59,4 +43,8 @@ func CreateOrganizer(db *sql.DB, o Organizer) error {
 	fmt.Printf("Organizer created successfully:\n %+v\n\n", o)
 
 	return nil
+}
+
+func ReadOrganizer(db *sql.DB, selectOpts Select) (*sql.Rows, error) {
+	return db.Query(`SELECT ? ? FROM organizers ? ?`, formatDistinct(selectOpts.Distinct), strings.Join(selectOpts.ColumnList, ","), formatJoin("organizers", selectOpts.JoinTables), formatRowFilters(selectOpts.RowFilter))
 }
