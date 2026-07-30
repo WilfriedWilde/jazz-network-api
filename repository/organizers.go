@@ -48,8 +48,25 @@ func CreateOrganizer(db *sql.DB, o Organizer) error {
 	return nil
 }
 
-func ReadOrganizer(db *sql.DB, selectOpts Select) (*sql.Rows, error) {
-	return db.Query(`SELECT ? ? FROM organizers ? ?`, formatDistinct(selectOpts.Distinct), strings.Join(selectOpts.ColumnList, ","), formatJoin("organizers", selectOpts.JoinTables), formatRowFilters(selectOpts.RowFilter))
+func ReadOrganizers(db *sql.DB, selectOpts Select) ([]Organizer, error) {
+  rows, err := db.Query(`
+    SELECT ? ? FROM organizers ? ?`,
+    formatDistinct(selectOpts.Distinct),
+    strings.Join(selectOpts.ColumnList, ","),
+    formatJoin("organizers", selectOpts.JoinTables),
+    formatRowFilters(selectOpts.RowFilter),
+  )
+  if err != nil {
+    return nil, fmt.Errorf("error reading organizers: %s", err.Error())
+  }
+
+  organizers := make([]Organizer, 0)
+
+  for rows.Next() {
+    
+  }
+  
+  return organizers, nil
 }
 
 func GetOrganizers() ([]Organizer, error) {
