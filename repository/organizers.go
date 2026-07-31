@@ -1,6 +1,7 @@
 package repository
 
 import (
+	"context"
 	"database/sql"
 	"encoding/csv"
 	"fmt"
@@ -9,67 +10,7 @@ import (
 	"strings"
 )
 
-var organizerTableStatement = `
-	CREATE TABLE IF NOT EXISTS organizers (
-		id INTEGER PRIMARY KEY,
-		type TEXT NOT NULL,
-		name TEXT NOT NULL,
-		country TEXT NOT NULL,
-		city TEXT NOT NULL,
-		address TEXT NOT NULL,
-		websites TEXT,
-		emails TEXT,
-		phone_numbers TEXT,
-		contact_persons TEXT,
-		schedule TEXT,
-		notes TEXT,
-		latitude REAL,
-		longitude REAL
-);`
-
-func CreateOrganizer(db *sql.DB, o Organizer) error {
-	_, err := db.Exec(`
-		INSERT INTO organizers (type, name, country, city, address, websites, emails, phone_numbers, contact_persons, schedule, notes, latitude, longitude) 
-		VALUES (?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?)`,
-		o.Type, o.Name, o.Country, o.City, o.Address,
-		strings.Join(o.Websites, ";"),
-		strings.Join(o.Emails, ";"),
-		strings.Join(o.PhoneNumbers, ";"),
-		strings.Join(o.ContactPersons, ";"),
-		o.Schedule, o.Notes, o.Latitude, o.Longitude,
-	)
-
-	if err != nil {
-		return fmt.Errorf("error creating organizer: %s\n", err.Error())
-	}
-
-	fmt.Printf("Organizer created successfully:\n %+v\n\n", o)
-
-	return nil
-}
-
-func ReadOrganizers(db *sql.DB, selectOpts Select) ([]Organizer, error) {
-  rows, err := db.Query(`
-    SELECT ? ? FROM organizers ? ?`,
-    formatDistinct(selectOpts.Distinct),
-    strings.Join(selectOpts.ColumnList, ","),
-    formatJoin("organizers", selectOpts.JoinTables),
-    formatRowFilters(selectOpts.RowFilter),
-  )
-  if err != nil {
-    return nil, fmt.Errorf("error reading organizers: %s", err.Error())
-  }
-
-  organizers := make([]Organizer, 0)
-
-  for rows.Next() {
-    
-  }
-  
-  return organizers, nil
-}
-
-func GetOrganizers() ([]Organizer, error) {
+func GetOrganizersFromCSV() ([]Organizer, error) {
 	file, err := os.Open("spreadsheet/jazz_network.csv")
 	if err != nil {
 		return nil, fmt.Errorf("error opening jazz_network.csv: %s\n", err.Error())
@@ -115,4 +56,88 @@ func GetOrganizers() ([]Organizer, error) {
 	}
 
 	return organizers, nil
+}
+
+func CreateOrganizer(db *sql.DB, o Organizer) error {
+	_, err := db.Exec(`
+		INSERT INTO organizers (type, name, country, city, address, websites, emails, phone_numbers, contact_persons, schedule, notes, latitude, longitude) 
+		VALUES (?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?)`,
+		o.Type, o.Name, o.Country, o.City, o.Address,
+		strings.Join(o.Websites, ";"),
+		strings.Join(o.Emails, ";"),
+		strings.Join(o.PhoneNumbers, ";"),
+		strings.Join(o.ContactPersons, ";"),
+		o.Schedule, o.Notes, o.Latitude, o.Longitude,
+	)
+
+	if err != nil {
+		return fmt.Errorf("error creating organizer: %s\n", err.Error())
+	}
+
+	fmt.Printf("Organizer created successfully:\n %+v\n\n", o)
+
+	return nil
+}
+
+func SelectAllOrganizers(ctx context.Context, db *sql.DB) ([]Organizer, error) {
+	rows, err := db.QueryContext(
+		ctx,
+		`SELECT * FROM organizers`,
+	)
+	if err != nil {
+		return nil, fmt.Errorf("error selecting organizer by id: %s", err.Error())
+	}
+	defer rows.Close()
+
+	organizers := make([]Organizer, 0)
+
+	for rows.Next() {
+		o := Organizer{}
+
+		if err := rows.Scan(
+			&o.ID,
+			&o.Type,
+			&o.Name,
+			&o.Country,
+			&o.City,
+			&o.Address,
+			&o.Websites,
+			&o.Emails,
+			&o.PhoneNumbers,
+			&o.ContactPersons,
+			&o.Schedule,
+			&o.Notes,
+			&o.Latitude,
+			&o.Longitude,
+		); err != nil {
+			return nil, fmt.Errorf("error scanning row: %s", err.Error())
+		}
+
+		organizers = append(organizers, o)
+	}
+	if err := rows.Err(); err != nil {
+		return nil, fmt.Errorf("error decoding rows: %s", err.Error())
+	}
+
+	return organizers, nil
+}
+
+func (o *Organizer) tableStatement() string {
+	return `
+		CREATE TABLE IF NOT EXISTS organizers (
+			id INTEGER PRIMARY KEY,
+			type TEXT NOT NULL,
+			name TEXT NOT NULL,
+			country TEXT NOT NULL,
+			city TEXT NOT NULL,
+			address TEXT NOT NULL,
+			websites TEXT,
+			emails TEXT,
+			phone_numbers TEXT,
+			contact_persons TEXT,
+			schedule TEXT,
+			notes TEXT,
+			latitude REAL,
+			longitude REAL
+	);`
 }

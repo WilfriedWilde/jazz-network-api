@@ -37,9 +37,9 @@ func InitDB() (*sql.DB, error) {
 		return nil, err
 	}
 
-	// add all organizers from spreadsheet
+	// add all organizers from spreadsheet if creating database
 	if !fileExists {
-		organizers, err := GetOrganizers()
+		organizers, err := GetOrganizersFromCSV()
 		if err != nil {
 			return nil, err
 		}
@@ -56,9 +56,11 @@ func InitDB() (*sql.DB, error) {
 
 func CreateTables(db *sql.DB) error {
 	var errs []error
+	o := Organizer{}
+	// TODO: create struct and corresponding methods for table statement for each entity
 
 	tablesStatements := map[string]string{
-		"organizers":         organizerTableStatement,
+		"organizers":         o.tableStatement(),
 		"organizer contacts": contactsTableStatement,
 		"organizer notes":    notesTableStatement,
 		"users":              usersTableStatement,
