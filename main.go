@@ -32,5 +32,5 @@ func main() {
 	mux.HandleFunc("GET /organizers", server.HandleSelectAllOrganizers)
 
 	fmt.Println("Running on http://localhost:8080")
-	log.Fatal(http.ListenAndServe(":8080", mux))
+	log.Fatal(http.ListenAndServe(":8080", corsMiddleWare(mux)))
 }
