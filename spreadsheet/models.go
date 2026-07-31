@@ -6,10 +6,10 @@ type Organizer struct {
 	Country        string
 	City           string
 	Address        string
-	Websites       []string
-	Emails         []string
-	PhoneNumbers   []string
-	ContactPersons []string
+	Websites       string
+	Emails         string
+	PhoneNumbers   string
+	ContactPersons string
 	Schedule       string
 	Notes          string
 	Latitude       float64

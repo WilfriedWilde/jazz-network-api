@@ -1,11 +1,28 @@
 package repository
 
 type Organizer struct {
+	ID             int
+	Type           string
+	Name           string
+	Country        string
+	City           string
+	Address        string
+	Websites       string
+	Emails         string
+	PhoneNumbers   string
+	ContactPersons string
+	Schedule       string
+	Notes          string
+	Latitude       float64
+	Longitude      float64
+}
+
+type OrganizerJSON struct {
 	ID             int      `json:"id"`
 	Type           string   `json:"type"`
 	Name           string   `json:"name"`
 	Country        string   `json:"country"`
-	City           string   `json:"ciy"`
+	City           string   `json:"city"`
 	Address        string   `json:"address"`
 	Websites       []string `json:"websites"`
 	Emails         []string `json:"emails"`

@@ -29,7 +29,6 @@ func main() {
 	}
 
 	mux := http.NewServeMux()
-
 	mux.HandleFunc("GET /organizers", server.HandleSelectAllOrganizers)
 
 	fmt.Println("Running on http://localhost:8080")

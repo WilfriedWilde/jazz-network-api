@@ -15,7 +15,12 @@ func (s *Server) HandleSelectAllOrganizers(w http.ResponseWriter, r *http.Reques
 		return
 	}
 
-	if err := json.NewEncoder(w).Encode(organizers); err != nil {
+	organizersJSON := make([]repository.OrganizerJSON, len(organizers))
+	for i, o := range organizers {
+		organizersJSON[i] = o.PrepareForJSON()
+	}
+
+	if err := json.NewEncoder(w).Encode(organizersJSON); err != nil {
 		log.Printf("error ecnoding organizers: %s", err.Error())
 		http.Error(w, err.Error(), http.StatusInternalServerError)
 	}
