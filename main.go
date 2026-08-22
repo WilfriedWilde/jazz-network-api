@@ -13,17 +13,32 @@ type Server struct {
 	db *sql.DB
 }
 
+var dbPath = "jazznetwork.db"
+
 func main() {
 	//s.UpdateSpreadSheet()
 
+	// check if database exists
+	exists := database.Exists(dbPath)
+
 	// init database
-	db, err := database.OpenDB()
+	db, err := database.OpenDB(fmt.Sprintf("%s?_foreign_keys=on", dbPath))
 	if err != nil {
 		log.Fatal(err)
 	}
 	defer db.Close()
 
 	db.SetMaxOpenConns(1)
+
+	if err := database.CreateTables(db); err != nil {
+		log.Fatal(err)
+	}
+
+	if !exists {
+		if err := database.Seed(db); err != nil {
+			log.Fatal(err)
+		}
+	}
 
 	// init server
 	server := Server{
