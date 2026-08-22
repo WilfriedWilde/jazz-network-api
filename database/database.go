@@ -12,12 +12,37 @@ import (
 //go:embed init.sql
 var initMigration string
 
-func Exists(path string) bool {
+func InitDB(path string) (*sql.DB, error) {
+	// check if database exists
+	exists := exists(path)
+
+	// init database
+	db, err := openDB(fmt.Sprintf("%s?_foreign_keys=on", path))
+	if err != nil {
+		return nil, err
+	}
+
+	db.SetMaxOpenConns(1)
+
+	if err := createTables(db); err != nil {
+		return nil, err
+	}
+
+	if !exists {
+		if err := seed(db); err != nil {
+			return nil, err
+		}
+	}
+
+	return db, nil
+}
+
+func exists(path string) bool {
 	_, err := os.Stat(path)
 	return !os.IsNotExist(err)
 }
 
-func OpenDB(path string) (*sql.DB, error) {
+func openDB(path string) (*sql.DB, error) {
 	// connect to database
 	db, err := sql.Open("sqlite3", path)
 	if err != nil {
@@ -33,7 +58,7 @@ func OpenDB(path string) (*sql.DB, error) {
 	return db, nil
 }
 
-func CreateTables(db *sql.DB) error {
+func createTables(db *sql.DB) error {
 	if _, err := db.Exec(initMigration); err != nil {
 		return fmt.Errorf("error creating tables: %w", err)
 	}

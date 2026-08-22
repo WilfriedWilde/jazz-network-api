@@ -12,7 +12,7 @@ import (
 	r "jazz-network-api/repository"
 )
 
-func Seed(db *sql.DB) error {
+func seed(db *sql.DB) error {
 	organizers, err := getOrganizersFromCSV()
 	if err != nil {
 		return fmt.Errorf("error getting organizers from csv file: %w", err)
