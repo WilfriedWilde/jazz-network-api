@@ -6,7 +6,7 @@ import (
 	"log"
 	"net/http"
 
-	r "jazz-network-api/repository"
+	"jazz-network-api/database"
 )
 
 type Server struct {
@@ -17,15 +17,17 @@ func main() {
 	//s.UpdateSpreadSheet()
 
 	// init database
-	database, err := r.InitDB()
+	db, err := database.OpenDB()
 	if err != nil {
 		log.Fatal(err)
 	}
-	defer database.Close()
+	defer db.Close()
+
+	db.SetMaxOpenConns(1)
 
 	// init server
 	server := Server{
-		db: database,
+		db: db,
 	}
 
 	mux := http.NewServeMux()
