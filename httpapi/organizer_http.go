@@ -13,7 +13,7 @@ type OrganizerHandler struct {
 	service *s.OrganizerService
 }
 
-func (h *OrganizerHandler) ReadAll(w http.ResponseWriter, r http.Request) {
+func (h *OrganizerHandler) ReadAll(w http.ResponseWriter, r *http.Request) {
 	organizers, err := h.service.ReadAll(r.Context())
 	if err != nil {
 		w.WriteHeader(http.StatusNotFound)
