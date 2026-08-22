@@ -17,7 +17,7 @@ func (s *Server) HandleSelectAllOrganizers(w http.ResponseWriter, r *http.Reques
 
 	organizersJSON := make([]repository.OrganizerJSON, len(organizers))
 	for i, o := range organizers {
-		organizersJSON[i] = o.PrepareForJSON()
+		organizersJSON[i] = repository.PrepareForJSON(o)
 	}
 
 	if err := json.NewEncoder(w).Encode(organizersJSON); err != nil {

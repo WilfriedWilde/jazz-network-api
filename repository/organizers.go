@@ -3,59 +3,22 @@ package repository
 import (
 	"context"
 	"database/sql"
-	"encoding/csv"
 	"fmt"
-	"os"
-	"strconv"
 	"strings"
+
+	"jazz-network-api/model"
 )
 
-func GetOrganizersFromCSV() ([]Organizer, error) {
-	file, err := os.Open("spreadsheet/jazz_network.csv")
-	if err != nil {
-		return nil, fmt.Errorf("error opening jazz_network.csv: %s\n", err.Error())
-	}
-	defer file.Close()
-
-	records, err := csv.NewReader(file).ReadAll()
-	if err != nil {
-		return nil, fmt.Errorf("error reading jazz_network.csv: %s\n", err.Error())
-	}
-
-	organizers := make([]Organizer, len(records)-1)
-
-	for rowID, row := range records[1:] {
-		latitude, err := strconv.ParseFloat(row[11], 64)
-		if err != nil {
-			return nil, fmt.Errorf("error parsing latitude: %s\n", err.Error())
-		}
-		longitude, err := strconv.ParseFloat(row[12], 64)
-		if err != nil {
-			return nil, fmt.Errorf("error parsing longitude: %s\n", err.Error())
-		}
-
-		organizers[rowID] = Organizer{
-			Type:           strings.TrimSpace(strings.ToLower(row[0])),
-			Name:           strings.TrimSpace(strings.ToLower(row[1])),
-			Country:        strings.TrimSpace(strings.ToLower(row[2])),
-			City:           strings.TrimSpace(strings.ToLower(row[3])),
-			Address:        strings.TrimSpace(strings.ToLower(row[4])),
-			Websites:       strings.TrimSpace(strings.ToLower(row[5])),
-			Emails:         strings.TrimSpace(strings.ToLower(row[6])),
-			PhoneNumbers:   strings.TrimSpace(strings.ToLower(row[7])),
-			ContactPersons: strings.TrimSpace(strings.ToLower(row[8])),
-			Schedule:       strings.TrimSpace(strings.ToLower(row[9])),
-			Notes:          strings.TrimSpace(row[10]),
-			Latitude:       latitude,
-			Longitude:      longitude,
-		}
-	}
-
-	return organizers, nil
+type OrganizerRepository struct {
+	db *sql.DB
 }
 
-func CreateOrganizer(db *sql.DB, o Organizer) error {
-	_, err := db.Exec(`
+func NewOrganizerRepository(db *sql.DB) *OrganizerRepository {
+	return &OrganizerRepository{db: db}
+}
+
+func (r *OrganizerRepository) CreateOrganizer(o model.Organizer) error {
+	_, err := r.db.Exec(`
 		INSERT INTO organizers (type, name, country, city, address, websites, emails, phone_numbers, contact_persons, schedule, notes, latitude, longitude) 
 		VALUES (?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?)`,
 		o.Type, o.Name, o.Country, o.City, o.Address,
@@ -64,7 +27,7 @@ func CreateOrganizer(db *sql.DB, o Organizer) error {
 	)
 
 	if err != nil {
-		return fmt.Errorf("error creating organizer: %s\n", err.Error())
+		return fmt.Errorf("error creating organizer: %w", err)
 	}
 
 	fmt.Printf("Organizer created successfully:\n %+v\n\n", o)
@@ -72,7 +35,7 @@ func CreateOrganizer(db *sql.DB, o Organizer) error {
 	return nil
 }
 
-func SelectAllOrganizers(ctx context.Context, db *sql.DB) ([]Organizer, error) {
+func SelectAllOrganizers(ctx context.Context, db *sql.DB) ([]model.Organizer, error) {
 	rows, err := db.QueryContext(
 		ctx,
 		`SELECT * FROM organizers`,
@@ -82,10 +45,10 @@ func SelectAllOrganizers(ctx context.Context, db *sql.DB) ([]Organizer, error) {
 	}
 	defer rows.Close()
 
-	organizers := make([]Organizer, 0)
+	organizers := make([]model.Organizer, 0)
 
 	for rows.Next() {
-		o := Organizer{}
+		o := model.Organizer{}
 
 		if err := rows.Scan(
 			&o.ID,
@@ -115,7 +78,8 @@ func SelectAllOrganizers(ctx context.Context, db *sql.DB) ([]Organizer, error) {
 	return organizers, nil
 }
 
-func (o *Organizer) PrepareForJSON() OrganizerJSON {
+// TODO: move this somewhere else
+func PrepareForJSON(o model.Organizer) OrganizerJSON {
 	return OrganizerJSON{
 		ID:             o.ID,
 		Type:           o.Type,
@@ -132,24 +96,4 @@ func (o *Organizer) PrepareForJSON() OrganizerJSON {
 		Latitude:       o.Latitude,
 		Longitude:      o.Longitude,
 	}
-}
-
-func (o *Organizer) tableStatement() string {
-	return `
-		CREATE TABLE IF NOT EXISTS organizers (
-			id INTEGER PRIMARY KEY,
-			type TEXT NOT NULL,
-			name TEXT NOT NULL,
-			country TEXT NOT NULL,
-			city TEXT NOT NULL,
-			address TEXT NOT NULL,
-			websites TEXT,
-			emails TEXT,
-			phone_numbers TEXT,
-			contact_persons TEXT,
-			schedule TEXT,
-			notes TEXT,
-			latitude REAL,
-			longitude REAL
-	);`
 }
