@@ -133,23 +133,3 @@ func (o *Organizer) PrepareForJSON() OrganizerJSON {
 		Longitude:      o.Longitude,
 	}
 }
-
-func (o *Organizer) tableStatement() string {
-	return `
-		CREATE TABLE IF NOT EXISTS organizers (
-			id INTEGER PRIMARY KEY,
-			type TEXT NOT NULL,
-			name TEXT NOT NULL,
-			country TEXT NOT NULL,
-			city TEXT NOT NULL,
-			address TEXT NOT NULL,
-			websites TEXT,
-			emails TEXT,
-			phone_numbers TEXT,
-			contact_persons TEXT,
-			schedule TEXT,
-			notes TEXT,
-			latitude REAL,
-			longitude REAL
-	);`
-}
