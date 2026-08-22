@@ -12,7 +12,7 @@ CREATE TABLE IF NOT EXISTS organizers (
     schedule TEXT,
     notes TEXT,
     latitude REAL,
-    longitude REAL,
+    longitude REAL
 );
 
 CREATE TABLE IF NOT EXISTS organizer_contacts (
@@ -24,12 +24,12 @@ CREATE TABLE IF NOT EXISTS organizer_contacts (
     last_attempted_at TEXT,
     notes TEXT,
     UNIQUE (user_id, organizer_id, method)
-)
+);
 
 CREATE TABLE IF NOT EXISTS users (
     id INTEGER PRIMARY KEY,
     full_name TEXT NOT NULL CHECK (length(trim(full_name)) > 0)
-)
+);
 
 CREATE TABLE IF NOT EXISTS user_notes (
     id INTEGER PRIMARY KEY,
@@ -37,13 +37,13 @@ CREATE TABLE IF NOT EXISTS user_notes (
     organizer_id INTEGER REFERENCES organizers(id),
     body TEXT NOT NULL,
     created_at TEXT
-)
+);
 
 CREATE TABLE IF NOT EXISTS tours (
     id INTEGER PRIMARY KEY,
     user_id INTEGER REFERENCES users(id),
     name TEXT NOT NULL CHECK (length(trim(name)) > 0)
-)
+);
 
 CREATE TABLE IF NOT EXISTS tour_stops (
     id INTEGER PRIMARY KEY,
@@ -51,4 +51,4 @@ CREATE TABLE IF NOT EXISTS tour_stops (
     organizer_id INTEGER REFERENCES organizers(id),
     notes TEXT,
     UNIQUE (tour_id, organizer_id)
-)
+);
