@@ -1,6 +1,7 @@
 package database
 
 import (
+	"context"
 	"database/sql"
 	"encoding/csv"
 	"fmt"
@@ -19,7 +20,7 @@ func seed(db *sql.DB) error {
 	}
 
 	for _, o := range organizers {
-		if err := r.NewOrganizerRepository(db).CreateOrganizer(o); err != nil {
+		if _, err := r.NewOrganizerRepository(db).Create(context.Background(), o); err != nil {
 			return err
 		}
 	}
