@@ -15,6 +15,7 @@ func NewRouter(db *sql.DB) http.Handler {
 	handlers := getHandlers(db)
 	mux := http.NewServeMux()
 
+	mux.HandleFunc("GET /api/organizers/{id}", handlers.organizer.Read)
 	mux.HandleFunc("GET /api/organizers", handlers.organizer.ReadAll)
 
 	return mux

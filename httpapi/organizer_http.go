@@ -13,6 +13,23 @@ type OrganizerHandler struct {
 	service *s.OrganizerService
 }
 
+func (h *OrganizerHandler) Read(w http.ResponseWriter, r *http.Request) {
+	id, err := parsePathID(r.PathValue("id"))
+	if err != nil {
+		writeError(w, err)
+	}
+
+	organizer, err := h.service.Read(r.Context(), id)
+	if err != nil {
+		writeError(w, err)
+	}
+
+	if err := json.NewEncoder(w).Encode(prepareForJSON(organizer)); err != nil {
+		log.Printf("error encoding organizer: %w", err)
+		http.Error(w, err.Error(), http.StatusInternalServerError)
+	}
+}
+
 func (h *OrganizerHandler) ReadAll(w http.ResponseWriter, r *http.Request) {
 	organizers, err := h.service.ReadAll(r.Context())
 	if err != nil {
@@ -25,7 +42,7 @@ func (h *OrganizerHandler) ReadAll(w http.ResponseWriter, r *http.Request) {
 	}
 
 	if err := json.NewEncoder(w).Encode(organizersJSON); err != nil {
-		log.Printf("error ecnoding organizers: %s", err.Error())
+		log.Printf("error encoding organizers: %w", err)
 		http.Error(w, err.Error(), http.StatusInternalServerError)
 	}
 }

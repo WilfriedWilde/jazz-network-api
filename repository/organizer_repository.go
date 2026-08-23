@@ -3,6 +3,7 @@ package repository
 import (
 	"context"
 	"database/sql"
+	"errors"
 	"fmt"
 
 	"jazz-network-api/model"
@@ -37,6 +38,9 @@ func (r *OrganizerRepository) Read(ctx context.Context, id int64) (model.Organiz
 	var organizer model.Organizer
 
 	if err := r.db.QueryRowContext(ctx, readOrganizerByIDQuery, id).Scan(&organizer); err != nil {
+		if errors.Is(err, sql.ErrNoRows) {
+			return model.Organizer{}, ErrNotFound
+		}
 		return model.Organizer{}, fmt.Errorf("read organizer by id: %w", err)
 	}
 

@@ -16,6 +16,15 @@ func NewOrganizerService(r *repository.OrganizerRepository) *OrganizerService {
 	return &OrganizerService{repository: r}
 }
 
+func (s *OrganizerService) Read(ctx context.Context, id int64) (model.Organizer, error) {
+	organizer, err := s.repository.Read(ctx, id)
+	if err != nil {
+		return model.Organizer{}, err
+	}
+
+	return organizer, nil
+}
+
 func (s *OrganizerService) ReadAll(ctx context.Context) ([]model.Organizer, error) {
 	organizers, err := s.repository.ReadAll(ctx)
 	if err != nil {
