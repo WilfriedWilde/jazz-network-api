@@ -5,11 +5,10 @@ import (
 	"fmt"
 	"jazz-network-api/model"
 	"jazz-network-api/repository"
-	r "jazz-network-api/repository"
 )
 
 type OrganizerService struct {
-	repository *r.OrganizerRepository
+	repository *repository.OrganizerRepository
 }
 
 func NewOrganizerService(r *repository.OrganizerRepository) *OrganizerService {
@@ -19,7 +18,7 @@ func NewOrganizerService(r *repository.OrganizerRepository) *OrganizerService {
 func (s *OrganizerService) Read(ctx context.Context, id int64) (model.Organizer, error) {
 	organizer, err := s.repository.Read(ctx, id)
 	if err != nil {
-		return model.Organizer{}, err
+		return model.Organizer{}, formatServiceError(err, "organizer")
 	}
 
 	return organizer, nil

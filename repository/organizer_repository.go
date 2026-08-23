@@ -37,7 +37,13 @@ func NewOrganizerRepository(db *sql.DB) *OrganizerRepository {
 func (r *OrganizerRepository) Read(ctx context.Context, id int64) (model.Organizer, error) {
 	var organizer model.Organizer
 
-	if err := r.db.QueryRowContext(ctx, readOrganizerByIDQuery, id).Scan(&organizer); err != nil {
+	if err := r.db.QueryRowContext(ctx, readOrganizerByIDQuery, id).Scan(
+		&organizer.ID, &organizer.Type, &organizer.Name,
+		&organizer.Country, &organizer.City, &organizer.Address,
+		&organizer.Websites, &organizer.Emails, &organizer.PhoneNumbers,
+		&organizer.ContactPersons, &organizer.Schedule, &organizer.Notes,
+		&organizer.Latitude, &organizer.Longitude,
+	); err != nil {
 		if errors.Is(err, sql.ErrNoRows) {
 			return model.Organizer{}, ErrNotFound
 		}

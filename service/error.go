@@ -1,5 +1,11 @@
 package service
 
+import (
+	"errors"
+	"jazz-network-api/repository"
+	"net/http"
+)
+
 type ServiceError struct {
 	Status  int
 	Code    string
@@ -16,4 +22,15 @@ func (e *ServiceError) GetCode() string {
 
 func (e *ServiceError) Error() string {
 	return e.Message
+}
+
+func formatServiceError(err error, entity string) error {
+	switch {
+	case errors.Is(err, repository.ErrNotFound):
+		return &ServiceError{
+			Status:  http.StatusNotFound,
+			Code:    "not_found",
+			Message: err.Error(),
+		}
+	}
 }
