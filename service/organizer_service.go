@@ -2,7 +2,6 @@ package service
 
 import (
 	"context"
-	"fmt"
 	"jazz-network-api/model"
 	"jazz-network-api/repository"
 )
@@ -18,7 +17,7 @@ func NewOrganizerService(r *repository.OrganizerRepository) *OrganizerService {
 func (s *OrganizerService) Read(ctx context.Context, id int64) (model.Organizer, error) {
 	organizer, err := s.repository.Read(ctx, id)
 	if err != nil {
-		return model.Organizer{}, formatServiceError(err, "organizer")
+		return model.Organizer{}, convertToServiceError("read", "organizer", err)
 	}
 
 	return organizer, nil
@@ -27,7 +26,7 @@ func (s *OrganizerService) Read(ctx context.Context, id int64) (model.Organizer,
 func (s *OrganizerService) ReadAll(ctx context.Context) ([]model.Organizer, error) {
 	organizers, err := s.repository.ReadAll(ctx)
 	if err != nil {
-		return nil, fmt.Errorf("read all organizers: %w", err)
+		return nil, convertToServiceError("read all", "organizers", err)
 	}
 
 	return organizers, nil

@@ -26,9 +26,9 @@ func (e *requestError) Error() string {
 }
 
 func writeError(w http.ResponseWriter, err error) {
-	var requestErr requestError
+	var requestErr *requestError
 
-	if errors.As(err, requestErr) {
+	if errors.As(err, &requestErr) {
 		writeJSON(w, requestErr.GetStatus(), errBody{
 			Code:    requestErr.GetCode(),
 			Message: requestErr.Error(),

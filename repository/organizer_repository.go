@@ -45,7 +45,7 @@ func (r *OrganizerRepository) Read(ctx context.Context, id int64) (model.Organiz
 		&organizer.Latitude, &organizer.Longitude,
 	); err != nil {
 		if errors.Is(err, sql.ErrNoRows) {
-			return model.Organizer{}, errors.Join(err, ErrNotFound)
+			return model.Organizer{}, ErrNotFound
 		}
 		return model.Organizer{}, fmt.Errorf("read organizer by id: %w", err)
 	}
@@ -72,13 +72,13 @@ func (r *OrganizerRepository) ReadAll(ctx context.Context) ([]model.Organizer, e
 			&o.ContactPersons, &o.Schedule, &o.Notes,
 			&o.Latitude, &o.Longitude,
 		); err != nil {
-			return nil, fmt.Errorf("error scanning organizer: %w", err)
+			return nil, fmt.Errorf("scan organizer: %w", err)
 		}
 
 		organizers = append(organizers, o)
 	}
 	if err := rows.Err(); err != nil {
-		return nil, fmt.Errorf("error iterating organizers rows: %w", err)
+		return nil, fmt.Errorf("iterate over organizers rows: %w", err)
 	}
 
 	return organizers, nil
@@ -98,7 +98,7 @@ func (r *OrganizerRepository) Create(ctx context.Context, o model.Organizer) (mo
 		&organizer.ContactPersons, &organizer.Schedule, &organizer.Notes,
 		&organizer.Latitude, &organizer.Longitude,
 	); err != nil {
-		return model.Organizer{}, fmt.Errorf("error creating organizer: %w", err)
+		return model.Organizer{}, fmt.Errorf("create organizer: %w", err)
 	}
 
 	return organizer, nil

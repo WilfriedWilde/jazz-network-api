@@ -1,0 +1,28 @@
+opencollection: 1.0.0
+
+info:
+  name: Jazz Network Database API
+config:
+  proxy:
+    inherit: true
+    config:
+      protocol: http
+      hostname: ""
+      port: ""
+      auth:
+        username: ""
+        password: ""
+      bypassProxy: ""
+
+request:
+  variables:
+    - name: baseURL
+      value: http://localhost:8080
+    - name: organizerID
+      value: "3"
+bundled: false
+extensions:
+  bruno:
+    ignore:
+      - node_modules
+      - .git
