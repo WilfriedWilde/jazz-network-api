@@ -2,8 +2,8 @@ package httpapi
 
 import (
 	"errors"
-	"jazz-network-api/repository"
 	"jazz-network-api/service"
+	"log"
 	"net/http"
 )
 
@@ -26,27 +26,31 @@ func (e *requestError) Error() string {
 }
 
 func writeError(w http.ResponseWriter, err error) {
-	var requestError *requestError
-	var serviceError *service.ServiceError
-	var repositoryError *repository.RepositoryError
+	var requestErr requestError
 
+	if errors.As(err, requestErr) {
+		writeJSON(w, requestErr.GetStatus(), errBody{
+			Code:    requestErr.GetCode(),
+			Message: requestErr.Error(),
+		})
+	}
+
+	writeAPIerror(w, err)
+}
+
+func writeAPIerror(w http.ResponseWriter, err error) {
 	switch {
-	case errors.As(err, &requestError):
-		writeJSON(w, requestError.GetStatus(), errBody{
-			Code:    requestError.GetCode(),
-			Message: requestError.Error(),
+	case errors.Is(err, service.ErrNotFound):
+		log.Println(err)
+		writeJSON(w, http.StatusNotFound, errBody{
+			Code:    "not_found",
+			Message: "resource not found",
 		})
-
-	case errors.As(err, &serviceError):
-		writeJSON(w, serviceError.GetStatus(), errBody{
-			Code:    serviceError.GetCode(),
-			Message: serviceError.Error(),
-		})
-
-	case errors.As(err, &repositoryError):
-		writeJSON(w, repositoryError.GetStatus(), errBody{
-			Code:    repositoryError.GetCode(),
-			Message: repositoryError.Error(),
+	default:
+		log.Println(err)
+		writeJSON(w, http.StatusInternalServerError, errBody{
+			Code:    "internal_error",
+			Message: "an unexpected error occurred",
 		})
 	}
 }

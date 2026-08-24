@@ -45,7 +45,7 @@ func (r *OrganizerRepository) Read(ctx context.Context, id int64) (model.Organiz
 		&organizer.Latitude, &organizer.Longitude,
 	); err != nil {
 		if errors.Is(err, sql.ErrNoRows) {
-			return model.Organizer{}, ErrNotFound
+			return model.Organizer{}, errors.Join(err, ErrNotFound)
 		}
 		return model.Organizer{}, fmt.Errorf("read organizer by id: %w", err)
 	}

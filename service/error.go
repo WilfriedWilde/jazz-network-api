@@ -2,35 +2,25 @@ package service
 
 import (
 	"errors"
+	"fmt"
 	"jazz-network-api/repository"
-	"net/http"
 )
 
-type ServiceError struct {
-	Status  int
-	Code    string
-	Message string
-}
+var (
+	ErrNotFound = errors.New("service: not found")
+)
 
-func (e *ServiceError) GetStatus() int {
-	return e.Status
-}
+func convertToServiceError(operation, resource string, err error) error {
+	var serviceErr error
 
-func (e *ServiceError) GetCode() string {
-	return e.Code
-}
-
-func (e *ServiceError) Error() string {
-	return e.Message
-}
-
-func formatServiceError(err error, entity string) error {
 	switch {
 	case errors.Is(err, repository.ErrNotFound):
-		return &ServiceError{
-			Status:  http.StatusNotFound,
-			Code:    "not_found",
-			Message: err.Error(),
-		}
+		serviceErr = ErrNotFound
 	}
+
+	if serviceErr != nil {
+		err = errors.Join(serviceErr, err)
+	}
+
+	return fmt.Errorf("%s %s: %w", operation, resource, err)
 }

@@ -3,5 +3,5 @@ package repository
 import "errors"
 
 var (
-	ErrNotFound = errors.New("not_found")
+	ErrNotFound = errors.New("repository: not found")
 )
