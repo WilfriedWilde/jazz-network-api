@@ -15,11 +15,13 @@ func (h *OrganizerHandler) Read(w http.ResponseWriter, r *http.Request) {
 	id, err := parsePathID(r.PathValue("id"))
 	if err != nil {
 		writeError(w, err)
+		return
 	}
 
 	organizer, err := h.service.Read(r.Context(), id)
 	if err != nil {
 		writeError(w, err)
+		return
 	}
 
 	writeJSON(w, http.StatusOK, prepareForJSON(organizer))
@@ -28,7 +30,8 @@ func (h *OrganizerHandler) Read(w http.ResponseWriter, r *http.Request) {
 func (h *OrganizerHandler) ReadAll(w http.ResponseWriter, r *http.Request) {
 	organizers, err := h.service.ReadAll(r.Context())
 	if err != nil {
-		w.WriteHeader(http.StatusNotFound)
+		writeError(w, err)
+		return
 	}
 
 	organizersJSON := make([]model.OrganizerJSON, len(organizers))
