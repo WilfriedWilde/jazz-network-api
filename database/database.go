@@ -15,7 +15,7 @@ var initMigration string
 func InitDB(path string) (*sql.DB, error) {
 	// check if database exists
 	exists := exists(path)
-	fmt.Println(exists)
+
 	// init database
 	db, err := openDB(fmt.Sprintf("%s?_foreign_keys=on", path))
 	if err != nil {

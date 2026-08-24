@@ -8,7 +8,6 @@ import (
 
 	"jazz-network-api/database"
 	"jazz-network-api/httpapi"
-	"jazz-network-api/spreadsheet"
 )
 
 type Server struct {
@@ -18,7 +17,7 @@ type Server struct {
 var dbPath = "jazznetwork.db"
 
 func main() {
-	spreadsheet.UpdateSpreadSheet()
+	//spreadsheet.UpdateSpreadSheet()
 
 	db, err := database.InitDB(dbPath)
 	if err != nil {
