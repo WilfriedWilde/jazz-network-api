@@ -1,10 +1,8 @@
 package httpapi
 
 import (
-	"encoding/json"
 	"jazz-network-api/model"
 	s "jazz-network-api/service"
-	"log"
 	"net/http"
 	"strings"
 )
@@ -24,10 +22,7 @@ func (h *OrganizerHandler) Read(w http.ResponseWriter, r *http.Request) {
 		writeError(w, err)
 	}
 
-	if err := json.NewEncoder(w).Encode(prepareForJSON(organizer)); err != nil {
-		log.Printf("error encoding organizer: %w", err)
-		http.Error(w, err.Error(), http.StatusInternalServerError)
-	}
+	writeJSON(w, http.StatusOK, prepareForJSON(organizer))
 }
 
 func (h *OrganizerHandler) ReadAll(w http.ResponseWriter, r *http.Request) {
@@ -41,10 +36,7 @@ func (h *OrganizerHandler) ReadAll(w http.ResponseWriter, r *http.Request) {
 		organizersJSON[i] = prepareForJSON(o)
 	}
 
-	if err := json.NewEncoder(w).Encode(organizersJSON); err != nil {
-		log.Printf("error encoding organizers: %w", err)
-		http.Error(w, err.Error(), http.StatusInternalServerError)
-	}
+	writeJSON(w, http.StatusOK, organizersJSON)
 }
 
 func prepareForJSON(o model.Organizer) model.OrganizerJSON {

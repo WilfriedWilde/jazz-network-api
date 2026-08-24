@@ -16,6 +16,6 @@ func writeJSON(w http.ResponseWriter, status int, value any) {
 	w.WriteHeader(status)
 
 	if err := json.NewEncoder(w).Encode(value); err != nil {
-		log.Printf("error encoding json: %w", err)
+		log.Printf("error encoding json: %s", err.Error())
 	}
 }
