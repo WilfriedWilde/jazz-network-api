@@ -11,7 +11,7 @@ type handlers struct {
 	organizer *OrganizerHandler
 }
 
-func NewRouter(db *sql.DB) http.Handler {
+func newRouter(db *sql.DB) http.Handler {
 	handlers := getHandlers(db)
 	mux := http.NewServeMux()
 
