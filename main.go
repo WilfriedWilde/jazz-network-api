@@ -46,7 +46,6 @@ func run() error {
 	defer db.Close()
 
 	router := httpapi.NewRouter(db)
-
 	handler := httpapi.CorsMiddleWare(router)
 
 	server := &http.Server{
