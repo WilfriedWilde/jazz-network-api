@@ -8,7 +8,7 @@ import (
 )
 
 type OrganizerHandler struct {
-	service *s.OrganizerService
+	Service *s.OrganizerService
 }
 
 func (h *OrganizerHandler) Read(w http.ResponseWriter, r *http.Request) {
@@ -18,7 +18,7 @@ func (h *OrganizerHandler) Read(w http.ResponseWriter, r *http.Request) {
 		return
 	}
 
-	organizer, err := h.service.Read(r.Context(), id)
+	organizer, err := h.Service.Read(r.Context(), id)
 	if err != nil {
 		writeError(w, err)
 		return
@@ -28,7 +28,7 @@ func (h *OrganizerHandler) Read(w http.ResponseWriter, r *http.Request) {
 }
 
 func (h *OrganizerHandler) ReadAll(w http.ResponseWriter, r *http.Request) {
-	organizers, err := h.service.ReadAll(r.Context())
+	organizers, err := h.Service.ReadAll(r.Context())
 	if err != nil {
 		writeError(w, err)
 		return

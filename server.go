@@ -1,4 +1,4 @@
-package httpapi
+package main
 
 import (
 	"context"
@@ -11,13 +11,12 @@ import (
 )
 
 const (
-	dbPath            = "jazznetwork.db"
 	serverAddress     = ":8080"
 	readHeaderTimeout = time.Second * 5
 	shutDownTimeout   = time.Second * 10
 )
 
-func Server(ctx context.Context, db *sql.DB) error {
+func server(ctx context.Context, db *sql.DB) error {
 	router := newRouter(db)
 	handler := corsMiddleWare(router)
 

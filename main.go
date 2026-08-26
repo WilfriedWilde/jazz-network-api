@@ -8,7 +8,6 @@ import (
 	"syscall"
 
 	"jazz-network-api/database"
-	"jazz-network-api/httpapi"
 )
 
 const dbPath = "jazznetwork.db"
@@ -31,5 +30,5 @@ func run() error {
 	}
 	defer db.Close()
 
-	return httpapi.Server(signalCtx, db)
+	return server(signalCtx, db)
 }

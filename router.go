@@ -1,14 +1,15 @@
-package httpapi
+package main
 
 import (
 	"database/sql"
+	"jazz-network-api/httpapi"
 	"jazz-network-api/repository"
 	"jazz-network-api/service"
 	"net/http"
 )
 
 type handlers struct {
-	organizer *OrganizerHandler
+	organizer *httpapi.OrganizerHandler
 }
 
 func newRouter(db *sql.DB) http.Handler {
@@ -26,6 +27,6 @@ func getHandlers(db *sql.DB) handlers {
 	organizerService := service.NewOrganizerService(organizerRepository)
 
 	return handlers{
-		organizer: &OrganizerHandler{service: organizerService},
+		organizer: &httpapi.OrganizerHandler{Service: organizerService},
 	}
 }
