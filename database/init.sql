@@ -61,14 +61,22 @@ CREATE TABLE IF NOT EXISTS tour_stops (
     id INTEGER PRIMARY KEY,
     tour_id INTEGER NOT NULL REFERENCES tours(id),
     organizer_id INTEGER REFERENCES organizers(id),
-    type TEXT NOT NULL CHECK (type IN ('gig', 'free_day', 'travel_day')))
-    stop_order INTEGER NOT NULL, 
+    type TEXT NOT NULL CHECK (type IN ('gig', 'free_day', 'travel_day')),
+    stop_order INTEGER NOT NULL,
     notes TEXT,
     CHECK (
       (type = 'gig' AND organizer_id IS NOT NULL)
       OR (type != 'gig' AND organizer_id IS NULL)
     ),
     UNIQUE (tour_id, stop_order)
+);
+
+CREATE TABLE IF NOT EXISTS tour_stop_finances (
+  id INTEGER PRIMARY key,
+  tour_stop_id INTEGER NOT NULL REFERENCES tour_stops(id),
+  category TEXT NOT NULL CHECK (category IN ('gig_fee', 'merch', 'food', 'transport', 'other')),
+  amount REAL NOT NULL DEFAULT 0,
+  notes TEXT
 );
 
 CREATE TABLE IF NOT EXISTS travels (
