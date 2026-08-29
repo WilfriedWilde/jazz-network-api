@@ -11,8 +11,8 @@ CREATE TABLE IF NOT EXISTS organizers (
     contact_persons TEXT,
     schedule TEXT,
     notes TEXT,
-    latitude REAL,
-    longitude REAL
+    latitude REAL NOT NULL,
+    longitude REAL NOT NULL
 );
 
 CREATE TABLE IF NOT EXISTS users (
@@ -20,19 +20,20 @@ CREATE TABLE IF NOT EXISTS users (
     username TEXT NOT NULL CHECK (length(trim(username)) > 0),
     email TEXT NOT NULL CHECK (length(trim(email)) > 0),
     password_hash TEXT NOT NULL (length(trim(password_hash)) > 0)
+    access_level INTEGER NOT NULL CHECK (access_level IN (0, 1))
 );
 
 CREATE TABLE IF NOT EXISTS sessions (
     uuid TEXT NOT NULL PRIMARY KEY,
-    user_id INTEGER REFERENCES users(id) ON DELETE CASCADE,
+    user_id INTEGER NOT NULL REFERENCES users(id) ON DELETE CASCADE,
     created_at TEXT NOT NULL DEFAULT CURRENT_TIMESTAMP,
     expires_at TEXT NOT NULL
 );
 
 CREATE TABLE IF NOT EXISTS organizer_contacts (
     id INTEGER PRIMARY KEY,
-    user_id INTEGER REFERENCES users(id),
-    organizer_id INTEGER REFERENCES organizers(id),
+    user_id INTEGER NOT NULL REFERENCES users(id),
+    organizer_id INTEGER NOT NULL REFERENCES organizers(id),
     method TEXT NOT NULL CHECK (method IN ('email', 'phone', 'in_person')),
     status TEXT CHECK (status IN ('not_tried', 'contacted', 'confirmed', 'declined')),
     last_attempted_at TEXT NOT NULL DEFAULT CURRENT_TIMESTAMP,
@@ -42,23 +43,48 @@ CREATE TABLE IF NOT EXISTS organizer_contacts (
 
 CREATE TABLE IF NOT EXISTS user_notes (
     id INTEGER PRIMARY KEY,
-    user_id INTEGER REFERENCES users(id),
-    organizer_id INTEGER REFERENCES organizers(id),
+    user_id INTEGER NOT NULL REFERENCES users(id),
+    organizer_id INTEGER NOT NULL REFERENCES organizers(id),
     body TEXT NOT NULL,
     created_at TEXT
 );
 
 CREATE TABLE IF NOT EXISTS tours (
     id INTEGER PRIMARY KEY,
-    user_id INTEGER REFERENCES users(id),
+    user_id INTEGER NOT NULL REFERENCES users(id),
     name TEXT NOT NULL CHECK (length(trim(name)) > 0)
+    start TEXT NOT NULL CHECK (length(trim(start)) > 0)
+    end TEXT NOT NULL CHECK (length(trim(end)) > 0)
 );
 
 CREATE TABLE IF NOT EXISTS tour_stops (
     id INTEGER PRIMARY KEY,
-    tour_id INTEGER REFERENCES tours(id),
+    tour_id INTEGER NOT NULL REFERENCES tours(id),
     organizer_id INTEGER REFERENCES organizers(id),
     stop_order INTEGER NOT NULL, 
     notes TEXT,
     UNIQUE (tour_id, organizer_id)
 );
+
+CREATE TABLE IF NOT EXISTS travels {
+    id INTEGER PRIMARY KEY
+    from INTEGER NOT NULL REFERENCES tour_stops(id)
+    to INTEGER NOT NULL REFERENCES tour_stops(id)
+    mean TEXT NOT NULL CHECK (mean IN ('car', 'taxi', 'bus', 'train', 'plane'))
+    cost REAL NOT NULL CHECK (cost >= 0)
+    booking_status TEXT CHECK (booking_status IN ('pending', 'booked'))
+    notes TEXT
+}
+
+CREATE TABLE IF NOT EXISTS accommodations {
+    id INTEGER PRIMARY KEY
+    tour_stop_id INTEGER NOT NULL REFERENCES tour_stops(id)
+    type TEXT NOT NULL CHECK (type IN ('hotel', 'hostel', 'airbnb', 'guesthouse', 'apartment', 'host_family', 'other'))
+    cost REAL NOT NULL CHECK (cost >= 0)
+    booking_status TEXT CHECK (booking_status IN ('pending', 'booked'))
+    name TEXT
+    address TEXT
+    email TEXT
+    phone_number TEXT
+    notes TEXT
+}
