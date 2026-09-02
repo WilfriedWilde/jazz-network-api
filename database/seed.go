@@ -3,6 +3,7 @@ package database
 import (
 	"context"
 	"database/sql"
+	_ "embed"
 	"encoding/csv"
 	"fmt"
 	"os"
@@ -13,19 +14,24 @@ import (
 	r "jazz-network-api/repository"
 )
 
-func seed(db *sql.DB) error {
+//go:embed seedData.sql
+var seedData string
+
+func seed(ctx context.Context, db *sql.DB) error {
 	organizers, err := getOrganizersFromCSV()
 	if err != nil {
-		return fmt.Errorf("error getting organizers from csv file: %w", err)
+		return fmt.Errorf("seed: get organizers from csv file: %w", err)
 	}
 
 	for _, o := range organizers {
-		if _, err := r.NewOrganizerRepository(db).Create(context.Background(), o); err != nil {
+		if _, err := r.NewOrganizerRepository(db).Create(ctx, o); err != nil {
 			return err
 		}
 	}
 
-	
+	if _, err = db.ExecContext(ctx, seedData); err != nil {
+		return fmt.Errorf("seed data: %w", err)
+	}
 
 	return nil
 }

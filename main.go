@@ -24,7 +24,7 @@ func run() error {
 
 	//s.UpdateSpreadSheet()
 
-	db, err := database.InitDB(dbPath)
+	db, err := database.InitDB(signalCtx, dbPath)
 	if err != nil {
 		log.Fatal(err)
 	}
