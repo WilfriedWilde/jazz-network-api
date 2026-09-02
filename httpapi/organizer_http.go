@@ -48,11 +48,11 @@ func (h *OrganizerHandler) Create(w http.ResponseWriter, r *http.Request) {
 		writeError(w, err)
 	}
 
-	organizers, err := h.Service.Create(r.Context(), input)
+	/*organizers, err := h.Service.Create(r.Context(), input)
 	if err != nil {
 		writeError(w, err)
 		return
-	}
+	}*/
 
 	organizersJSON := make([]model.OrganizerJSON, len(organizers))
 	for i, o := range organizers {

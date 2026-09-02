@@ -24,6 +24,10 @@ const (
 		INSERT INTO organizers(type, name, country, city, address, websites, emails, phone_numbers, contact_persons, schedule, notes, latitude, longitude)
 		VALUES (?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?)
 		RETURNING *`
+
+  createUserOrganizerLinkQuery = `
+		INSERT INTO user_organizers(user_id, organizer_id)
+		VALUES (?, ?)`
 )
 
 type OrganizerRepository struct {
@@ -102,4 +106,12 @@ func (r *OrganizerRepository) Create(ctx context.Context, o model.Organizer) (mo
 	}
 
 	return organizer, nil
+}
+
+func (r *OrganizerRepository) CreateUserOrganizerLink(ctx context.Context, userID, organizerID int) error {
+  if _, err := r.db.ExecContext(ctx, createUserOrganizerLinkQuery, userID, organizerID); err != nil {
+    return fmt.Errorf("create user-organizer link: %w", err)
+  }
+  
+  return nil
 }
