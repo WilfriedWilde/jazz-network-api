@@ -41,7 +41,7 @@ func writeError(w http.ResponseWriter, err error) {
 func writeAPIerror(w http.ResponseWriter, err error) {
 	switch {
 	case errors.Is(err, service.ErrNotFound):
-		log.Println(err)
+		log.Print(err)
 		writeJSON(w, http.StatusNotFound, errBody{
 			Code:    "not_found",
 			Message: "resource not found",

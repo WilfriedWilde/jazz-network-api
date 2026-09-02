@@ -25,6 +25,8 @@ func seed(db *sql.DB) error {
 		}
 	}
 
+	
+
 	return nil
 }
 

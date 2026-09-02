@@ -19,7 +19,7 @@ request:
     - name: baseURL
       value: http://localhost:8080
     - name: organizerID
-      value: "3"
+      value: "330"
 bundled: false
 extensions:
   bruno:

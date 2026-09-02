@@ -23,6 +23,12 @@ CREATE TABLE IF NOT EXISTS users (
     access_level INTEGER NOT NULL CHECK (access_level IN (0, 1))
 );
 
+CREATE TABLE IF NOT EXISTS user_organizers (
+    user_id INTEGER NOT NULL REFERENCES users(id) ON DELETE CASCADE,
+    organizer_id INTEGER NOT NULL REFERENCES organizers(id) ON DELETE CASCADE,
+    UNIQUE (user_id, organizer_id)
+)
+
 CREATE TABLE IF NOT EXISTS sessions (
     uuid TEXT NOT NULL PRIMARY KEY,
     user_id INTEGER NOT NULL REFERENCES users(id) ON DELETE CASCADE,
@@ -32,26 +38,24 @@ CREATE TABLE IF NOT EXISTS sessions (
 
 CREATE TABLE IF NOT EXISTS organizer_contacts (
     id INTEGER PRIMARY KEY,
-    user_id INTEGER NOT NULL REFERENCES users(id),
-    organizer_id INTEGER NOT NULL REFERENCES organizers(id),
+    user_organizer_id INTEGER NOT NULL REFERENCES user_organizers(id) ON DELETE CASCADE,
     method TEXT NOT NULL CHECK (method IN ('email', 'phone', 'in_person')),
     status TEXT CHECK (status IN ('not_tried', 'contacted', 'confirmed', 'declined')),
     last_attempted_at TEXT NOT NULL DEFAULT CURRENT_TIMESTAMP,
     notes TEXT,
-    UNIQUE (user_id, organizer_id, method)
+    UNIQUE (user_organizer_id, method)
 );
 
 CREATE TABLE IF NOT EXISTS user_notes (
     id INTEGER PRIMARY KEY,
-    user_id INTEGER NOT NULL REFERENCES users(id),
-    organizer_id INTEGER NOT NULL REFERENCES organizers(id),
+    user_organizer_id INTEGER NOT NULL REFERENCES user_organizers(id) ON DELETE CASCADE,
     body TEXT NOT NULL,
     created_at TEXT
 );
 
 CREATE TABLE IF NOT EXISTS tours (
     id INTEGER PRIMARY KEY,
-    user_id INTEGER NOT NULL REFERENCES users(id),
+    user_id INTEGER NOT NULL REFERENCES users(id) ON DELETE CASCADE,
     name TEXT NOT NULL CHECK (length(trim(name)) > 0),
     start TEXT NOT NULL CHECK (length(trim(start)) > 0),
     end TEXT NOT NULL CHECK (length(trim(end)) > 0)
