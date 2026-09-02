@@ -19,8 +19,8 @@ CREATE TABLE IF NOT EXISTS users (
     id INTEGER PRIMARY KEY,
     username TEXT NOT NULL CHECK (length(trim(username)) > 0),
     email TEXT NOT NULL CHECK (length(trim(email)) > 0),
-    password_hash TEXT NOT NULL (length(trim(password_hash)) > 0),
-    access_level INTEGER NOT NULL CHECK (access_level IN (0, 1)),
+    password_hash TEXT NOT NULL CHECK (length(trim(password_hash)) > 0),
+    access_level INTEGER NOT NULL CHECK (access_level IN (0, 1))
 );
 
 CREATE TABLE IF NOT EXISTS sessions (
@@ -72,7 +72,7 @@ CREATE TABLE IF NOT EXISTS tour_stops (
 );
 
 CREATE TABLE IF NOT EXISTS tour_stop_finances (
-  id INTEGER PRIMARY key,
+  id INTEGER PRIMARY KEY,
   tour_stop_id INTEGER NOT NULL REFERENCES tour_stops(id),
   category TEXT NOT NULL CHECK (category IN ('gig_fee', 'merch', 'food', 'transport', 'other')),
   amount REAL NOT NULL DEFAULT 0,

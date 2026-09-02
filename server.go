@@ -28,6 +28,7 @@ func server(ctx context.Context, db *sql.DB) error {
 
 	return serve(ctx, server)
 }
+
 func serve(ctx context.Context, server *http.Server) error {
 	fmt.Printf("Server listening and serving HTTP on http://localhost%s\n", serverAddress)
 
