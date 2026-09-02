@@ -19,3 +19,9 @@ func writeJSON(w http.ResponseWriter, status int, value any) {
 		log.Printf("error encoding json: %s", err.Error())
 	}
 }
+
+func decodeJSON[T any](w http.ResponseWriter, r *http.Request) (T, error) {
+	var zero T
+
+	return zero, nil
+}
