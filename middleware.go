@@ -1,8 +1,16 @@
 package main
 
-import "net/http"
+import (
+	repo "jazz-network-api/repository"
+	"net/http"
+)
 
-const allowedAddress = "http://localhost:5173"
+type contextKey string
+
+const (
+	allowedAddress = "http://localhost:5173"
+	userContextKey = "user"
+)
 
 func corsMiddleWare(next http.Handler) http.Handler {
 	return http.HandlerFunc(func(w http.ResponseWriter, r *http.Request) {
@@ -12,6 +20,26 @@ func corsMiddleWare(next http.Handler) http.Handler {
 
 		if r.Method == "OPTIONS" {
 			w.WriteHeader(http.StatusNoContent)
+			return
+		}
+
+		next.ServeHTTP(w, r)
+	})
+}
+
+func authMiddleWare(next http.Handler) http.Handler {
+	return http.HandlerFunc(func(w http.ResponseWriter, r *http.Request) {
+		sessionID, err := getSessionID(r)
+		if err != nil {
+			http.Error(w, "unauthorized", http.StatusUnauthorized)
+			return
+		}
+
+		sessionRepo := repo.NewSessionRepository()
+
+		userID, err := sessionRepo.GetUserIDBySession(r.Context(), sessionRepo.DB, sessionID)
+		if err != nil {
+			http.Error(w, "unauthorized", http.StatusUnauthorized)
 			return
 		}
 

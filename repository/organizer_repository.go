@@ -40,10 +40,10 @@ func NewOrganizerRepository(db *sql.DB) *OrganizerRepository {
 	return &OrganizerRepository{DB: db}
 }
 
-func (r *OrganizerRepository) Read(ctx context.Context, id int64) (model.Organizer, error) {
+func (r *OrganizerRepository) Read(ctx context.Context, db DBTX, id int64) (model.Organizer, error) {
 	var organizer model.Organizer
 
-	if err := r.DB.QueryRowContext(ctx, readOrganizerByIDQuery, id).Scan(
+	if err := db.QueryRowContext(ctx, readOrganizerByIDQuery, id).Scan(
 		&organizer.ID, &organizer.Type, &organizer.Name,
 		&organizer.Country, &organizer.City, &organizer.Address,
 		&organizer.Websites, &organizer.Emails, &organizer.PhoneNumbers,
@@ -53,14 +53,15 @@ func (r *OrganizerRepository) Read(ctx context.Context, id int64) (model.Organiz
 		if errors.Is(err, sql.ErrNoRows) {
 			return model.Organizer{}, ErrNotFound
 		}
+
 		return model.Organizer{}, fmt.Errorf("read organizer by id: %w", err)
 	}
 
 	return organizer, nil
 }
 
-func (r *OrganizerRepository) ReadAll(ctx context.Context) ([]model.Organizer, error) {
-	rows, err := r.DB.QueryContext(ctx, readAllOrganizersQuery)
+func (r *OrganizerRepository) ReadAll(ctx context.Context, db DBTX) ([]model.Organizer, error) {
+	rows, err := db.QueryContext(ctx, readAllOrganizersQuery)
 	if err != nil {
 		return nil, fmt.Errorf("read all organizers: %w", err)
 	}
@@ -90,10 +91,10 @@ func (r *OrganizerRepository) ReadAll(ctx context.Context) ([]model.Organizer, e
 	return organizers, nil
 }
 
-func (r *OrganizerRepository) Create(ctx context.Context, o model.OrganizerCreate) (model.Organizer, error) {
+func (r *OrganizerRepository) Create(ctx context.Context, db DBTX, o model.OrganizerCreate) (model.Organizer, error) {
 	var organizer model.Organizer
 
-	if err := r.db.QueryRowContext(ctx, createOrganizerQuery,
+	if err := db.QueryRowContext(ctx, createOrganizerQuery,
 		o.Type, o.Name, o.Country, o.City, o.Address,
 		o.Websites, o.Emails, o.PhoneNumbers, o.ContactPersons,
 		o.Schedule, o.Notes, o.Latitude, o.Longitude,
@@ -105,16 +106,21 @@ func (r *OrganizerRepository) Create(ctx context.Context, o model.OrganizerCreat
 		&organizer.Latitude, &organizer.Longitude,
 	); err != nil {
 		if errors.Is(err, sqlite3.ErrConstraintUnique) {
-
+			return model.Organizer{}, ErrDuplicate
 		}
+
 		return model.Organizer{}, fmt.Errorf("create organizer: %w", err)
 	}
 
 	return organizer, nil
 }
 
-func (r *OrganizerRepository) CreateUserOrganizerLink(ctx context.Context, userID, organizerID int) error {
-	if _, err := r.db.ExecContext(ctx, createUserOrganizerLinkQuery, userID, organizerID); err != nil {
+func (r *OrganizerRepository) CreateUserOrganizerLink(ctx context.Context, db DBTX, link model.UserOrganizerCreate) error {
+	if _, err := db.ExecContext(ctx, createUserOrganizerLinkQuery, link.UserID, link.OrganizerID); err != nil {
+		if errors.Is(err, sqlite3.ErrConstraintUnique) {
+			return ErrDuplicate
+		}
+
 		return fmt.Errorf("create user-organizer link: %w", err)
 	}
 

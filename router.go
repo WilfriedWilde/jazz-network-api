@@ -18,7 +18,7 @@ func newRouter(db *sql.DB) http.Handler {
 
 	mux.HandleFunc("GET /api/organizers/{id}", handlers.organizer.Read)
 	mux.HandleFunc("GET /api/organizers", handlers.organizer.ReadAll)
-	//mux.HandleFunc("POST /api/organizers", handlers.organizer.Create)
+	mux.HandleFunc("POST /api/organizers", handlers.organizer.Create)
 
 	return mux
 }
@@ -26,6 +26,9 @@ func newRouter(db *sql.DB) http.Handler {
 func getHandlers(db *sql.DB) handlers {
 	organizerRepository := repository.NewOrganizerRepository(db)
 	organizerService := service.NewOrganizerService(organizerRepository)
+
+	sessionRepository := repository.NewSessionRepository(db)
+	sessionService := service.NewSessionService(sessionRepository)
 
 	return handlers{
 		organizer: &httpapi.OrganizerHandler{Service: organizerService},

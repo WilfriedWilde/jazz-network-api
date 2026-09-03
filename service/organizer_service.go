@@ -16,7 +16,7 @@ func NewOrganizerService(r *repository.OrganizerRepository) *OrganizerService {
 }
 
 func (s *OrganizerService) Read(ctx context.Context, id int64) (model.Organizer, error) {
-	organizer, err := s.repository.Read(ctx, id)
+	organizer, err := s.repository.Read(ctx, s.repository.DB, id)
 	if err != nil {
 		return model.Organizer{}, convertToServiceError("read", "organizer", err)
 	}
@@ -25,7 +25,7 @@ func (s *OrganizerService) Read(ctx context.Context, id int64) (model.Organizer,
 }
 
 func (s *OrganizerService) ReadAll(ctx context.Context) ([]model.Organizer, error) {
-	organizers, err := s.repository.ReadAll(ctx)
+	organizers, err := s.repository.ReadAll(ctx, s.repository.DB)
 	if err != nil {
 		return nil, convertToServiceError("read all", "organizers", err)
 	}
@@ -40,12 +40,27 @@ func (s *OrganizerService) Create(ctx context.Context, input model.OrganizerCrea
 	}
 	defer tx.Rollback()
 
-	organizer, err := s.repository.Create(ctx, input.ToOrganizerCreate())
+	user, err := s.repository.Read
+
+	organizer, err := s.repository.Create(ctx, tx, input.ToOrganizerCreate())
 	if err != nil {
-		convertToServiceError("create", "organizer", err)
+		return model.Organizer{}, convertToServiceError("create", "organizer", err)
 	}
 
-	tx.Commit()
+	isAdmin := user.AccessLevel == 1
+
+	if !isAdmin {
+		if err := s.repository.CreateUserOrganizerLink(ctx, tx, model.UserOrganizerCreate{
+			UserID:      input.UserID,
+			OrganizerID: organizer.ID,
+		}); err != nil {
+			return model.Organizer{}, convertToServiceError("create", "user_organizer", err)
+		}
+	}
+
+	if err := tx.Commit(); err != nil {
+		return model.Organizer{}, fmt.Errorf("commit transaction: %w", err)
+	}
 
 	return organizer, nil
 }

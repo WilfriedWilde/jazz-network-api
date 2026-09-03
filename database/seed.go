@@ -31,7 +31,7 @@ func seed(ctx context.Context, db *sql.DB) error {
 
 	for userID := 1; userID < 3; userID++ {
 		for _, o := range organizers {
-			if _, err := organizerRepo.Create(ctx, model.OrganizerCreateInput{
+			if _, err := organizerRepo.Create(ctx, db, model.OrganizerCreate{
 				Type:           o.Type,
 				Name:           o.Name,
 				Country:        o.Country,
