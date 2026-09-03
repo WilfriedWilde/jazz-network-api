@@ -3,6 +3,7 @@ package main
 import (
 	"database/sql"
 	"jazz-network-api/httpapi"
+	m "jazz-network-api/middleware"
 	"jazz-network-api/repository"
 	"jazz-network-api/service"
 	"net/http"
@@ -10,15 +11,19 @@ import (
 
 type handlers struct {
 	organizer *httpapi.OrganizerHandler
+	session   *httpapi.SessionHandler
 }
 
 func newRouter(db *sql.DB) http.Handler {
 	handlers := getHandlers(db)
+	sessionRepository := repository.NewSessionRepository(db)
+	requireAuth := m.AuthMiddleware(sessionRepository)
+
 	mux := http.NewServeMux()
 
-	mux.HandleFunc("GET /api/organizers/{id}", handlers.organizer.Read)
-	mux.HandleFunc("GET /api/organizers", handlers.organizer.ReadAll)
-	mux.HandleFunc("POST /api/organizers", handlers.organizer.Create)
+	mux.Handle("GET /api/organizers/{id}", requireAuth(http.HandlerFunc(handlers.organizer.Read)))
+	mux.Handle("GET /api/organizers", requireAuth(http.HandlerFunc(handlers.organizer.ReadAll)))
+	mux.Handle("POST /api/organizers", requireAuth(http.HandlerFunc(handlers.organizer.Create)))
 
 	return mux
 }
@@ -32,5 +37,6 @@ func getHandlers(db *sql.DB) handlers {
 
 	return handlers{
 		organizer: &httpapi.OrganizerHandler{Service: organizerService},
+		session:   &httpapi.SessionHandler{Service: sessionService},
 	}
 }

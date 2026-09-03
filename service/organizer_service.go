@@ -3,6 +3,7 @@ package service
 import (
 	"context"
 	"fmt"
+	m "jazz-network-api/middleware"
 	"jazz-network-api/model"
 	"jazz-network-api/repository"
 )
@@ -40,11 +41,14 @@ func (s *OrganizerService) Create(ctx context.Context, input model.OrganizerCrea
 	}
 	defer tx.Rollback()
 
-	user, err := s.repository.Read
-
 	organizer, err := s.repository.Create(ctx, tx, input.ToOrganizerCreate())
 	if err != nil {
 		return model.Organizer{}, convertToServiceError("create", "organizer", err)
+	}
+
+	user, ok := m.UserFromContext(ctx)
+	if !ok {
+		return model.Organizer{}, fmt.Errorf("get user from context")
 	}
 
 	isAdmin := user.AccessLevel == 1

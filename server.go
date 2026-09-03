@@ -5,6 +5,7 @@ import (
 	"database/sql"
 	"errors"
 	"fmt"
+	m "jazz-network-api/middleware"
 	"log"
 	"net/http"
 	"time"
@@ -18,7 +19,7 @@ const (
 
 func server(ctx context.Context, db *sql.DB) error {
 	router := newRouter(db)
-	handler := corsMiddleWare(router)
+	handler := m.CorsMiddleWare(router)
 
 	server := &http.Server{
 		Addr:              serverAddress,
