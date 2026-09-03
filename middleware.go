@@ -35,7 +35,7 @@ func authMiddleWare(next http.Handler) http.Handler {
 			return
 		}
 
-		sessionRepo := repo.NewSessionRepository()
+		sessionRepo := repo.NewSessionRepository(db)
 
 		userID, err := sessionRepo.GetUserIDBySession(r.Context(), sessionRepo.DB, sessionID)
 		if err != nil {
