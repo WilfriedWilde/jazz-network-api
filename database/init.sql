@@ -13,6 +13,7 @@ CREATE TABLE IF NOT EXISTS organizers (
     notes TEXT,
     latitude REAL NOT NULL,
     longitude REAL NOT NULL
+    UNIQUE (trim(name), trim(city))
 );
 
 CREATE TABLE IF NOT EXISTS users (
@@ -26,7 +27,7 @@ CREATE TABLE IF NOT EXISTS users (
 CREATE TABLE IF NOT EXISTS user_organizers (
     user_id INTEGER NOT NULL REFERENCES users(id) ON DELETE CASCADE,
     organizer_id INTEGER NOT NULL REFERENCES organizers(id) ON DELETE CASCADE,
-    UNIQUE (user_id, organizer_id)
+    PRIMARY KEY (user_id, organizer_id)
 );
 
 CREATE TABLE IF NOT EXISTS sessions (

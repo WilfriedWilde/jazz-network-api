@@ -43,23 +43,18 @@ func (h *OrganizerHandler) ReadAll(w http.ResponseWriter, r *http.Request) {
 }
 
 func (h *OrganizerHandler) Create(w http.ResponseWriter, r *http.Request) {
-	input, err := decodeJSON[model.OrganizerCreate](w, r)
+	input, err := decodeJSON[model.OrganizerCreateInput](w, r)
 	if err != nil {
 		writeError(w, err)
 	}
 
-	organizers, err := h.Service.Create(r.Context(), input)
+	organizer, err := h.Service.Create(r.Context(), input)
 	if err != nil {
 		writeError(w, err)
 		return
 	}
 
-	organizersJSON := make([]model.OrganizerJSON, len(organizers))
-	for i, o := range organizers {
-		organizersJSON[i] = prepareForJSON(o)
-	}
-
-	writeJSON(w, http.StatusOK, organizersJSON)
+	writeJSON(w, http.StatusOK, prepareForJSON(organizer))
 }
 
 func prepareForJSON(o model.Organizer) model.OrganizerJSON {

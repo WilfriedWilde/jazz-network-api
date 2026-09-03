@@ -2,6 +2,7 @@ package service
 
 import (
 	"context"
+	"fmt"
 	"jazz-network-api/model"
 	"jazz-network-api/repository"
 )
@@ -30,4 +31,21 @@ func (s *OrganizerService) ReadAll(ctx context.Context) ([]model.Organizer, erro
 	}
 
 	return organizers, nil
+}
+
+func (s *OrganizerService) Create(ctx context.Context, input model.OrganizerCreateInput) (model.Organizer, error) {
+	tx, err := s.repository.DB.BeginTx(ctx, nil)
+	if err != nil {
+		return model.Organizer{}, fmt.Errorf("begin transaction: %w", err)
+	}
+	defer tx.Rollback()
+
+	organizer, err := s.repository.Create(ctx, input.ToOrganizerCreate())
+	if err != nil {
+		convertToServiceError("create", "organizer", err)
+	}
+
+	tx.Commit()
+
+	return organizer, nil
 }

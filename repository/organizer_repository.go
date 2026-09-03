@@ -7,6 +7,8 @@ import (
 	"fmt"
 
 	"jazz-network-api/model"
+
+	"github.com/mattn/go-sqlite3"
 )
 
 const (
@@ -25,23 +27,23 @@ const (
 		VALUES (?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?)
 		RETURNING *`
 
-  createUserOrganizerLinkQuery = `
+	createUserOrganizerLinkQuery = `
 		INSERT INTO user_organizers(user_id, organizer_id)
 		VALUES (?, ?)`
 )
 
 type OrganizerRepository struct {
-	db *sql.DB
+	DB *sql.DB
 }
 
 func NewOrganizerRepository(db *sql.DB) *OrganizerRepository {
-	return &OrganizerRepository{db: db}
+	return &OrganizerRepository{DB: db}
 }
 
 func (r *OrganizerRepository) Read(ctx context.Context, id int64) (model.Organizer, error) {
 	var organizer model.Organizer
 
-	if err := r.db.QueryRowContext(ctx, readOrganizerByIDQuery, id).Scan(
+	if err := r.DB.QueryRowContext(ctx, readOrganizerByIDQuery, id).Scan(
 		&organizer.ID, &organizer.Type, &organizer.Name,
 		&organizer.Country, &organizer.City, &organizer.Address,
 		&organizer.Websites, &organizer.Emails, &organizer.PhoneNumbers,
@@ -58,7 +60,7 @@ func (r *OrganizerRepository) Read(ctx context.Context, id int64) (model.Organiz
 }
 
 func (r *OrganizerRepository) ReadAll(ctx context.Context) ([]model.Organizer, error) {
-	rows, err := r.db.QueryContext(ctx, readAllOrganizersQuery)
+	rows, err := r.DB.QueryContext(ctx, readAllOrganizersQuery)
 	if err != nil {
 		return nil, fmt.Errorf("read all organizers: %w", err)
 	}
@@ -88,7 +90,7 @@ func (r *OrganizerRepository) ReadAll(ctx context.Context) ([]model.Organizer, e
 	return organizers, nil
 }
 
-func (r *OrganizerRepository) Create(ctx context.Context, o model.Organizer) (model.Organizer, error) {
+func (r *OrganizerRepository) Create(ctx context.Context, o model.OrganizerCreate) (model.Organizer, error) {
 	var organizer model.Organizer
 
 	if err := r.db.QueryRowContext(ctx, createOrganizerQuery,
@@ -102,6 +104,9 @@ func (r *OrganizerRepository) Create(ctx context.Context, o model.Organizer) (mo
 		&organizer.ContactPersons, &organizer.Schedule, &organizer.Notes,
 		&organizer.Latitude, &organizer.Longitude,
 	); err != nil {
+		if errors.Is(err, sqlite3.ErrConstraintUnique) {
+
+		}
 		return model.Organizer{}, fmt.Errorf("create organizer: %w", err)
 	}
 
@@ -109,9 +114,9 @@ func (r *OrganizerRepository) Create(ctx context.Context, o model.Organizer) (mo
 }
 
 func (r *OrganizerRepository) CreateUserOrganizerLink(ctx context.Context, userID, organizerID int) error {
-  if _, err := r.db.ExecContext(ctx, createUserOrganizerLinkQuery, userID, organizerID); err != nil {
-    return fmt.Errorf("create user-organizer link: %w", err)
-  }
-  
-  return nil
+	if _, err := r.db.ExecContext(ctx, createUserOrganizerLinkQuery, userID, organizerID); err != nil {
+		return fmt.Errorf("create user-organizer link: %w", err)
+	}
+
+	return nil
 }

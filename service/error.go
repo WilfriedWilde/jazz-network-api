@@ -7,7 +7,8 @@ import (
 )
 
 var (
-	ErrNotFound = errors.New("service: not found")
+	ErrNotFound  = errors.New("service: not found")
+	ErrDuplicate = errors.New("service: duplicate value")
 )
 
 func convertToServiceError(operation, resource string, err error) error {
@@ -16,6 +17,9 @@ func convertToServiceError(operation, resource string, err error) error {
 	switch {
 	case errors.Is(err, repository.ErrNotFound):
 		serviceErr = ErrNotFound
+
+	case errors.Is(err, repository.ErrDuplicate):
+		serviceErr = ErrDuplicate
 	}
 
 	if serviceErr != nil {

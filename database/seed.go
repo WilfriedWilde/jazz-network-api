@@ -18,27 +18,38 @@ import (
 var seedData string
 
 func seed(ctx context.Context, db *sql.DB) error {
-  if _, err := db.ExecContext(ctx, seedData); err != nil {
+	if _, err := db.ExecContext(ctx, seedData); err != nil {
 		return fmt.Errorf("seed data: %w", err)
 	}
 
-  organizerRepo := r.NewOrganizerRepository(db);
-  
+	organizerRepo := r.NewOrganizerRepository(db)
+
 	organizers, err := getOrganizersFromCSV()
 	if err != nil {
 		return fmt.Errorf("seed: get organizers from csv file: %w", err)
 	}
 
-	for _, o := range organizers {
-		if _, err := organizerRepo.Create(ctx, o); err != nil {
-			return err
+	for userID := 1; userID < 3; userID++ {
+		for _, o := range organizers {
+			if _, err := organizerRepo.Create(ctx, model.OrganizerCreateInput{
+				Type:           o.Type,
+				Name:           o.Name,
+				Country:        o.Country,
+				City:           o.City,
+				Address:        o.Address,
+				Websites:       o.Websites,
+				Emails:         o.Emails,
+				PhoneNumbers:   o.PhoneNumbers,
+				ContactPersons: o.ContactPersons,
+				Schedule:       o.Schedule,
+				Notes:          o.Notes,
+				Latitude:       o.Latitude,
+				Longitude:      o.Longitude,
+				UserID:         userID,
+			}); err != nil {
+				return err
+			}
 		}
-
-    for userID := 1; userID < 3; userID++ {
-      if err := organizerRepo.CreateUserOrganizerLink(ctx, userID, o.ID); err != nil {
-        return err
-      } 
-    }
 	}
 
 	return nil

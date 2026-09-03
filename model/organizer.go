@@ -1,5 +1,7 @@
 package model
 
+import "strings"
+
 type Organizer struct {
 	ID             int
 	Type           string
@@ -17,7 +19,7 @@ type Organizer struct {
 	Longitude      float64
 }
 
-type OrganizerCreate struct {
+type OrganizerCreateInput struct {
 	Type           string   `json:"type"`
 	Name           string   `json:"name"`
 	Country        string   `json:"country"`
@@ -31,6 +33,43 @@ type OrganizerCreate struct {
 	Notes          string   `json:"notes"`
 	Latitude       float64  `json:"latitude"`
 	Longitude      float64  `json:"longitude"`
+	UserID         int      `json:"user_id"`
+}
+
+func (o *OrganizerCreateInput) ToOrganizerCreate() OrganizerCreate {
+	return OrganizerCreate{
+		Type:           o.Type,
+		Name:           o.Name,
+		Country:        o.Country,
+		City:           o.City,
+		Address:        o.Address,
+		Websites:       strings.Join(o.Websites, ";"),
+		Emails:         strings.Join(o.Emails, ";"),
+		PhoneNumbers:   strings.Join(o.PhoneNumbers, ";"),
+		ContactPersons: strings.Join(o.ContactPersons, ";"),
+		Schedule:       o.Schedule,
+		Notes:          o.Notes,
+		Latitude:       o.Latitude,
+		Longitude:      o.Longitude,
+		UserID:         o.UserID,
+	}
+}
+
+type OrganizerCreate struct {
+	Type           string
+	Name           string
+	Country        string
+	City           string
+	Address        string
+	Websites       string
+	Emails         string
+	PhoneNumbers   string
+	ContactPersons string
+	Schedule       string
+	Notes          string
+	Latitude       float64
+	Longitude      float64
+	UserID         int
 }
 
 type OrganizerJSON struct {
