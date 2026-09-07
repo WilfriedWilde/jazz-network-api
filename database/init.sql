@@ -1,5 +1,6 @@
 CREATE TABLE IF NOT EXISTS organizers (
     id INTEGER PRIMARY KEY,
+    owner_user_id INTEGER REFERENCES users(id)
     type TEXT NOT NULL CHECK (length(trim(type)) > 0),
     name TEXT NOT NULL CHECK (length(trim(name)) > 0),
     country TEXT NOT NULL CHECK (length(trim(country)) > 0),
@@ -12,7 +13,8 @@ CREATE TABLE IF NOT EXISTS organizers (
     schedule TEXT,
     notes TEXT,
     latitude REAL NOT NULL,
-    longitude REAL NOT NULL
+    longitude REAL NOT NULL,
+    public_visibility BOOLEAN NOT NULL DEFAULT FALSE
 );
 
 CREATE TABLE IF NOT EXISTS users (
@@ -21,12 +23,6 @@ CREATE TABLE IF NOT EXISTS users (
     email TEXT NOT NULL CHECK (length(trim(email)) > 0),
     password_hash TEXT NOT NULL CHECK (length(trim(password_hash)) > 0),
     access_level INTEGER NOT NULL CHECK (access_level IN (0, 1))
-);
-
-CREATE TABLE IF NOT EXISTS user_organizers (
-    user_id INTEGER NOT NULL REFERENCES users(id) ON DELETE CASCADE,
-    organizer_id INTEGER NOT NULL REFERENCES organizers(id) ON DELETE CASCADE,
-    UNIQUE (user_id, organizer_id)
 );
 
 CREATE TABLE IF NOT EXISTS sessions (
