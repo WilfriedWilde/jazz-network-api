@@ -19,7 +19,7 @@ type Organizer struct {
 	Longitude      float64
 }
 
-type OrganizerCreateInput struct {
+type OrganizerInput struct {
 	Type           string   `json:"type"`
 	Name           string   `json:"name"`
 	Country        string   `json:"country"`
@@ -36,7 +36,7 @@ type OrganizerCreateInput struct {
 	UserID         int      `json:"user_id"`
 }
 
-func (o *OrganizerCreateInput) ToOrganizerCreate() OrganizerCreate {
+func (o *OrganizerInput) ToOrganizerCreate() OrganizerCreate {
 	return OrganizerCreate{
 		Type:           o.Type,
 		Name:           o.Name,

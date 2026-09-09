@@ -34,7 +34,7 @@ func (s *OrganizerService) ReadAll(ctx context.Context) ([]model.Organizer, erro
 	return organizers, nil
 }
 
-func (s *OrganizerService) Create(ctx context.Context, input model.OrganizerCreateInput) (model.Organizer, error) {
+func (s *OrganizerService) Create(ctx context.Context, input model.OrganizerInput) (model.Organizer, error) {
 	tx, err := s.repository.DB.BeginTx(ctx, nil)
 	if err != nil {
 		return model.Organizer{}, fmt.Errorf("begin transaction: %w", err)

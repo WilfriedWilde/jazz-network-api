@@ -35,8 +35,14 @@ func getHandlers(db *sql.DB) handlers {
 	sessionRepository := repository.NewSessionRepository(db)
 	sessionService := service.NewSessionService(sessionRepository)
 
+	userRepository := repository.NewUserRepository(db)
+	userService := service.NewUserService(userRepository)
+
 	return handlers{
 		organizer: &httpapi.OrganizerHandler{Service: organizerService},
-		session:   &httpapi.SessionHandler{Service: sessionService},
+		session: &httpapi.SessionHandler{
+			SessionService: sessionService,
+			UserService:    userService,
+		},
 	}
 }

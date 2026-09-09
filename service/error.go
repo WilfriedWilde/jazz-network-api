@@ -7,8 +7,12 @@ import (
 )
 
 var (
-	ErrNotFound  = errors.New("service: not found")
-	ErrDuplicate = errors.New("service: duplicate value")
+	ErrNotFound         = errors.New("service: not found")
+	ErrDuplicate        = errors.New("service: duplicate value")
+	ErrUsernameTaken    = errors.New("service: username taken")
+	ErrEmailTaken       = errors.New("service: email taken")
+	ErrPasswordTooShort = errors.New("service: password too short")
+	ErrPasswordTooWeak  = errors.New("service: password too weak")
 )
 
 func convertToServiceError(operation, resource string, err error) error {

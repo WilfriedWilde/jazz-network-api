@@ -43,7 +43,7 @@ func (h *OrganizerHandler) ReadAll(w http.ResponseWriter, r *http.Request) {
 }
 
 func (h *OrganizerHandler) Create(w http.ResponseWriter, r *http.Request) {
-	input, err := decodeJSON[model.OrganizerCreateInput](w, r)
+	input, err := decodeJSON[model.OrganizerInput](w, r)
 	if err != nil {
 		writeError(w, err)
 	}
