@@ -81,5 +81,9 @@ func (r *UserRepository) GetByEmail(ctx context.Context, db DBTX, email string) 
 		&user.PasswordHash, &user.AccessLevel,
 	)
 
+	if errors.Is(err, sql.ErrNoRows) {
+		err = ErrNotFound
+	}
+
 	return &user, err
 }

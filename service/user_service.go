@@ -11,6 +11,8 @@ import (
 
 const userLevel = 0
 
+var dummyHash = []byte("$2a$10$CwTycUXWue0Thq9StjUM0uJ8vHZlHUqR8DUoxfawR9.p0AR5xLDVy")
+
 type UserService struct {
 	repository *repository.UserRepository
 }
@@ -58,4 +60,18 @@ func (s *UserService) Create(ctx context.Context, input model.UserInput) (model.
 	}
 
 	return user, nil
+}
+
+func (s *UserService) Authenticate(ctx context.Context, input model.UserInput) (model.User, error) {
+	user, err := s.repository.GetByEmail(ctx, s.repository.DB, input.Email)
+	if err != nil {
+		bcrypt.CompareHashAndPassword(dummyHash, []byte(input.Password))
+		return model.User{}, convertToServiceError("authenticate", "user", ErrInvalidCredentials)
+	}
+
+	if err := bcrypt.CompareHashAndPassword([]byte(user.PasswordHash), []byte(input.Password)); err != nil {
+		return model.User{}, convertToServiceError("authenticate", "user", ErrInvalidCredentials)
+	}
+
+	return *user, nil
 }

@@ -71,7 +71,7 @@ func (s *SessionHandler) Login(w http.ResponseWriter, r *http.Request) {
 		return
 	}
 
-	user, err := s.UserService.Read(r.Context(), input)
+	user, err := s.UserService.Authenticate(r.Context(), input)
 	if err != nil {
 		writeError(w, err)
 		return
