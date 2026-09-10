@@ -9,7 +9,10 @@ import (
 	"golang.org/x/crypto/bcrypt"
 )
 
-const userLevel = 0
+const (
+	userAccessLevel  = 0
+	adminAccessLevel = 1
+)
 
 var dummyHash = []byte("$2a$10$CwTycUXWue0Thq9StjUM0uJ8vHZlHUqR8DUoxfawR9.p0AR5xLDVy")
 
@@ -49,7 +52,7 @@ func (s *UserService) Create(ctx context.Context, input model.UserInput) (model.
 		Username:     input.Username,
 		Email:        input.Email,
 		PasswordHash: string(passwordHash),
-		AccessLevel:  userLevel,
+		AccessLevel:  userAccessLevel,
 	})
 	if err != nil {
 		return model.User{}, convertToServiceError("create", "user", err)

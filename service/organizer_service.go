@@ -51,7 +51,7 @@ func (s *OrganizerService) Create(ctx context.Context, input model.OrganizerInpu
 		return model.Organizer{}, fmt.Errorf("get user from context")
 	}
 
-	isAdmin := user.AccessLevel == 1
+	isAdmin := user.AccessLevel == adminAccessLevel
 
 	if !isAdmin {
 		if err := s.repository.CreateUserOrganizerLink(ctx, tx, model.UserOrganizerCreate{

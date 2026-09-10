@@ -1,6 +1,6 @@
 CREATE TABLE IF NOT EXISTS organizers (
     id INTEGER PRIMARY KEY,
-    owner_user_id INTEGER REFERENCES users(id)
+    user_id INTEGER REFERENCES users(id),
     type TEXT NOT NULL CHECK (length(trim(type)) > 0),
     name TEXT NOT NULL CHECK (length(trim(name)) > 0),
     country TEXT NOT NULL CHECK (length(trim(country)) > 0),
