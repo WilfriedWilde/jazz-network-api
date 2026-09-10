@@ -46,6 +46,7 @@ func (h *OrganizerHandler) Create(w http.ResponseWriter, r *http.Request) {
 	input, err := decodeJSON[model.OrganizerInput](w, r)
 	if err != nil {
 		writeError(w, err)
+		return
 	}
 
 	organizer, err := h.Service.Create(r.Context(), input)

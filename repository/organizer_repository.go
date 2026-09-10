@@ -15,21 +15,25 @@ const (
 	readOrganizerByIDQuery = `
 		SELECT *
 		FROM organizers
-		WHERE id = ?`
+		WHERE id = ?
+	`
 
 	readAllOrganizersQuery = `
 		SELECT * 
 		FROM organizers
-		ORDER BY id ASC`
+		ORDER BY id ASC
+	`
 
 	createOrganizerQuery = `
 		INSERT INTO organizers(type, name, country, city, address, websites, emails, phone_numbers, contact_persons, schedule, notes, latitude, longitude)
 		VALUES (?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?)
-		RETURNING *`
+		RETURNING *
+	`
 
 	createUserOrganizerLinkQuery = `
 		INSERT INTO user_organizers(user_id, organizer_id)
-		VALUES (?, ?)`
+		VALUES (?, ?)
+	`
 )
 
 type OrganizerRepository struct {

@@ -10,11 +10,17 @@ import (
 )
 
 const (
+	createSessionQuery = `
+		INSERT INTO sessions(uuid, user_id, created_at, expires_at)
+		VALUES(?, ?, ?, ?)
+	`
+
 	getUserBySessionQuery = `
 		SELECT u.id, u.username, u.email, u.password_hash, u.access_level
 		FROM sessions AS s
 		JOIN users AS u ON u.id = s.user_id
-		WHERE s.uuid = ? AND s.expires_at > ?`
+		WHERE s.uuid = ? AND s.expires_at > ?
+	`
 )
 
 type SessionRepository struct {
@@ -23,6 +29,23 @@ type SessionRepository struct {
 
 func NewSessionRepository(db *sql.DB) *SessionRepository {
 	return &SessionRepository{DB: db}
+}
+
+func (r *SessionRepository) Create(ctx context.Context, s model.Session) (model.Session, error) {
+	var session model.Session
+	err := r.DB.QueryRowContext(
+		ctx, createSessionQuery,
+		s.UUID,
+		s.UserID,
+		s.CreatedAt,
+		s.ExpiresAt,
+	).Scan(
+		session.UUID,
+		session.UserID,
+		session.CreatedAt,
+		session.ExpiresAt,
+	)
+	return session, err
 }
 
 func (r *SessionRepository) GetUserBySession(ctx context.Context, db DBTX, sessionUUID string) (model.User, error) {

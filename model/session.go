@@ -1,6 +1,6 @@
 package model
 
-type SessionCreate struct {
+type Session struct {
 	UUID      string
 	UserID    int64
 	CreatedAt string
