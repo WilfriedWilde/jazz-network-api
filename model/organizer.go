@@ -36,25 +36,6 @@ type OrganizerInput struct {
 	PublicVisibility bool     `json:"public_visibility"`
 }
 
-func (o *OrganizerInput) ToOrganizerCreate() OrganizerCreate {
-	return OrganizerCreate{
-		Type:             o.Type,
-		Name:             o.Name,
-		Country:          o.Country,
-		City:             o.City,
-		Address:          o.Address,
-		Websites:         strings.Join(o.Websites, ";"),
-		Emails:           strings.Join(o.Emails, ";"),
-		PhoneNumbers:     strings.Join(o.PhoneNumbers, ";"),
-		ContactPersons:   strings.Join(o.ContactPersons, ";"),
-		Schedule:         o.Schedule,
-		Notes:            o.Notes,
-		Latitude:         o.Latitude,
-		Longitude:        o.Longitude,
-		PublicVisibility: o.PublicVisibility,
-	}
-}
-
 type OrganizerCreate struct {
 	Type             string
 	Name             string
@@ -88,4 +69,42 @@ type OrganizerJSON struct {
 	Notes          string   `json:"notes"`
 	Latitude       float64  `json:"latitude"`
 	Longitude      float64  `json:"longitude"`
+}
+
+func (o *OrganizerInput) ToOrganizerCreate() OrganizerCreate {
+	return OrganizerCreate{
+		Type:             o.Type,
+		Name:             o.Name,
+		Country:          o.Country,
+		City:             o.City,
+		Address:          o.Address,
+		Websites:         strings.Join(o.Websites, ";"),
+		Emails:           strings.Join(o.Emails, ";"),
+		PhoneNumbers:     strings.Join(o.PhoneNumbers, ";"),
+		ContactPersons:   strings.Join(o.ContactPersons, ";"),
+		Schedule:         o.Schedule,
+		Notes:            o.Notes,
+		Latitude:         o.Latitude,
+		Longitude:        o.Longitude,
+		PublicVisibility: o.PublicVisibility,
+	}
+}
+
+func (o *Organizer) ToOrganizerJSON() OrganizerJSON {
+	return OrganizerJSON{
+		ID:             o.ID,
+		Type:           o.Type,
+		Name:           o.Name,
+		Country:        o.Country,
+		City:           o.City,
+		Address:        o.Address,
+		Websites:       strings.Split(o.Websites, ";"),
+		Emails:         strings.Split(o.Emails, ";"),
+		PhoneNumbers:   strings.Split(o.PhoneNumbers, ";"),
+		ContactPersons: strings.Split(o.ContactPersons, ";"),
+		Schedule:       o.Schedule,
+		Notes:          o.Notes,
+		Latitude:       o.Latitude,
+		Longitude:      o.Longitude,
+	}
 }
