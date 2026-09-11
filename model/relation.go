@@ -1,6 +1,6 @@
 package model
 
 type UserOrganizerCreate struct {
-	UserID      int
-	OrganizerID int
+	UserID      int64
+	OrganizerID int64
 }

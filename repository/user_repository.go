@@ -68,6 +68,10 @@ func (r *UserRepository) GetByUsername(ctx context.Context, db DBTX, username st
 		&user.PasswordHash, &user.AccessLevel,
 	)
 
+	if errors.Is(err, sql.ErrNoRows) {
+		return nil, nil
+	}
+
 	return &user, err
 }
 
@@ -80,6 +84,10 @@ func (r *UserRepository) GetByEmail(ctx context.Context, db DBTX, email string) 
 		&user.ID, &user.Username, &user.Email,
 		&user.PasswordHash, &user.AccessLevel,
 	)
+
+	if errors.Is(err, sql.ErrNoRows) {
+		return nil, nil
+	}
 
 	return &user, err
 }

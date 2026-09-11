@@ -13,6 +13,7 @@ const (
 	createSessionQuery = `
 		INSERT INTO sessions(uuid, user_id, created_at, expires_at)
 		VALUES(?, ?, ?, ?)
+		RETURNING *
 	`
 
 	getUserBySessionQuery = `
@@ -33,6 +34,7 @@ func NewSessionRepository(db *sql.DB) *SessionRepository {
 
 func (r *SessionRepository) Create(ctx context.Context, s model.Session) (model.Session, error) {
 	var session model.Session
+
 	err := r.DB.QueryRowContext(
 		ctx, createSessionQuery,
 		s.UUID,
@@ -40,11 +42,12 @@ func (r *SessionRepository) Create(ctx context.Context, s model.Session) (model.
 		s.CreatedAt,
 		s.ExpiresAt,
 	).Scan(
-		session.UUID,
-		session.UserID,
-		session.CreatedAt,
-		session.ExpiresAt,
+		&session.UUID,
+		&session.UserID,
+		&session.CreatedAt,
+		&session.ExpiresAt,
 	)
+
 	return session, err
 }
 

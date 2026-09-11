@@ -16,11 +16,19 @@ const (
 		SELECT *
 		FROM organizers
 		WHERE id = ?
+		AND (
+			public_visibility = TRUE
+			OR user_id = ?
+			OR (user_id IS NULL AND ?)
+		)
 	`
 
 	readAllOrganizersQuery = `
 		SELECT * 
 		FROM organizers
+		WHERE public_visibility = TRUE
+			OR user_id = ?
+			OR (user_id IS NULL AND ?) 
 		ORDER BY id ASC
 	`
 
@@ -44,10 +52,10 @@ func NewOrganizerRepository(db *sql.DB) *OrganizerRepository {
 	return &OrganizerRepository{DB: db}
 }
 
-func (r *OrganizerRepository) Read(ctx context.Context, db DBTX, id int64) (model.Organizer, error) {
+func (r *OrganizerRepository) Read(ctx context.Context, db DBTX, organizerID, userID int64, isAdmin bool) (model.Organizer, error) {
 	var organizer model.Organizer
 
-	if err := db.QueryRowContext(ctx, readOrganizerByIDQuery, id).Scan(
+	if err := db.QueryRowContext(ctx, readOrganizerByIDQuery, organizerID, userID, isAdmin).Scan(
 		&organizer.ID, &organizer.Type, &organizer.Name,
 		&organizer.Country, &organizer.City, &organizer.Address,
 		&organizer.Websites, &organizer.Emails, &organizer.PhoneNumbers,
@@ -64,8 +72,8 @@ func (r *OrganizerRepository) Read(ctx context.Context, db DBTX, id int64) (mode
 	return organizer, nil
 }
 
-func (r *OrganizerRepository) ReadAll(ctx context.Context, db DBTX) ([]model.Organizer, error) {
-	rows, err := db.QueryContext(ctx, readAllOrganizersQuery)
+func (r *OrganizerRepository) ReadAll(ctx context.Context, db DBTX, userID int64, isAdmin bool) ([]model.Organizer, error) {
+	rows, err := db.QueryContext(ctx, readAllOrganizersQuery, userID, isAdmin)
 	if err != nil {
 		return nil, fmt.Errorf("read all organizers: %w", err)
 	}

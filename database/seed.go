@@ -29,7 +29,7 @@ func seed(ctx context.Context, db *sql.DB) error {
 		return fmt.Errorf("seed: get organizers from csv file: %w", err)
 	}
 
-	for userID := 1; userID < 3; userID++ {
+	for userID := int64(1); userID < int64(3); userID++ {
 		for _, o := range organizers {
 			if _, err := organizerRepo.Create(ctx, db, model.OrganizerCreate{
 				Type:           o.Type,

@@ -43,7 +43,7 @@ func (s *SessionHandler) Signup(w http.ResponseWriter, r *http.Request) {
 	}
 
 	http.SetCookie(w, &http.Cookie{
-		Name:     "sessionUUID",
+		Name:     "session_UUID",
 		Value:    session.UUID,
 		Expires:  time.Now().Add(service.SessionExpiryTime),
 		HttpOnly: true,
@@ -84,7 +84,7 @@ func (s *SessionHandler) Login(w http.ResponseWriter, r *http.Request) {
 	}
 
 	http.SetCookie(w, &http.Cookie{
-		Name:     "sessionUUID",
+		Name:     "session_UUID",
 		Value:    session.UUID,
 		Expires:  time.Now().Add(service.SessionExpiryTime),
 		HttpOnly: true,
