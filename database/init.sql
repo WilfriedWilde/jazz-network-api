@@ -12,8 +12,8 @@ CREATE TABLE IF NOT EXISTS organizers (
     contact_persons TEXT,
     schedule TEXT,
     notes TEXT,
-    latitude REAL NOT NULL,
-    longitude REAL NOT NULL,
+    latitude REAL NOT NULL CHECK (latitude >= -90 AND latitude <= 90),
+    longitude REAL NOT NULL CHECK (latitude >= -180 AND latitude <= 180),
     public_visibility BOOLEAN NOT NULL DEFAULT FALSE
 );
 

@@ -49,6 +49,10 @@ func (s *OrganizerService) ReadAll(ctx context.Context) ([]model.Organizer, erro
 }
 
 func (s *OrganizerService) Create(ctx context.Context, input model.OrganizerInput) (model.Organizer, error) {
+	if err := validateOrganizerInput(input); err != nil {
+		return model.Organizer{}, err
+	}
+
 	user, ok := m.UserFromContext(ctx)
 	if !ok {
 		return model.Organizer{}, fmt.Errorf("get user from context")

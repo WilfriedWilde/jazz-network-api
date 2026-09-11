@@ -4,16 +4,12 @@ import (
 	"encoding/json"
 	"errors"
 	"io"
+	"jazz-network-api/model"
 	"log"
 	"mime"
 	"net/http"
 	"strings"
 )
-
-type errBody struct {
-	Code    string `json:"code"`
-	Message string `json:"message"`
-}
 
 const maxBodyBytes = 1 << 20
 
@@ -32,7 +28,7 @@ func decodeJSON[T any](w http.ResponseWriter, r *http.Request) (T, error) {
 	// Require a JSON Content-Type while allowing parameters such as charset=utf-8.
 	mediaType, _, err := mime.ParseMediaType(r.Header.Get("Content-Type"))
 	if err != nil || !strings.EqualFold(mediaType, "application/json") {
-		return zero, &requestError{
+		return zero, &model.RequestError{
 			Status:  http.StatusUnsupportedMediaType,
 			Code:    "unsupported_media_type",
 			Message: "Content-Type must be application/json",
@@ -51,7 +47,7 @@ func decodeJSON[T any](w http.ResponseWriter, r *http.Request) (T, error) {
 	if err := decoder.Decode(&input); err != nil {
 		// EOF on the first decode means that the body is empty or contains only whitespace.
 		if errors.Is(err, io.EOF) {
-			return zero, &requestError{
+			return zero, &model.RequestError{
 				Status:  http.StatusBadRequest,
 				Code:    "malformed_request",
 				Message: "request body must not be empty",
@@ -61,7 +57,7 @@ func decodeJSON[T any](w http.ResponseWriter, r *http.Request) (T, error) {
 		// MaxBytesReader reports an oversized body while the decoder is reading it.
 		var maxBytesErr *http.MaxBytesError
 		if errors.As(err, &maxBytesErr) {
-			return zero, &requestError{
+			return zero, &model.RequestError{
 				Status:  http.StatusRequestEntityTooLarge,
 				Code:    "malformed_request",
 				Message: "request body is too large",
@@ -77,7 +73,7 @@ func decodeJSON[T any](w http.ResponseWriter, r *http.Request) (T, error) {
 				field = "request body"
 			}
 
-			return zero, &requestError{
+			return zero, &model.RequestError{
 				Status:  http.StatusBadRequest,
 				Code:    "malformed_request",
 				Message: field + " has an invalid JSON type",
@@ -89,7 +85,7 @@ func decodeJSON[T any](w http.ResponseWriter, r *http.Request) (T, error) {
 		const unknownFieldPrefix = "json: unknown field "
 		if strings.HasPrefix(err.Error(), unknownFieldPrefix) {
 			field := strings.TrimPrefix(err.Error(), unknownFieldPrefix)
-			return zero, &requestError{
+			return zero, &model.RequestError{
 				Status:  http.StatusBadRequest,
 				Code:    "malformed_request",
 				Message: "unknown property " + field,
@@ -100,7 +96,7 @@ func decodeJSON[T any](w http.ResponseWriter, r *http.Request) (T, error) {
 		// otherwise valid JSON that ends before the current value is complete.
 		var syntaxErr *json.SyntaxError
 		if errors.As(err, &syntaxErr) || errors.Is(err, io.ErrUnexpectedEOF) {
-			return zero, &requestError{
+			return zero, &model.RequestError{
 				Status:  http.StatusBadRequest,
 				Code:    "malformed_request",
 				Message: "request body contains malformed JSON",
@@ -108,7 +104,7 @@ func decodeJSON[T any](w http.ResponseWriter, r *http.Request) (T, error) {
 		}
 
 		// Keep unrecognized decoder failures generic so internal diagnostics are not exposed.
-		return zero, &requestError{
+		return zero, &model.RequestError{
 			Status:  http.StatusBadRequest,
 			Code:    "malformed_request",
 			Message: "request body contains invalid JSON",
@@ -117,7 +113,7 @@ func decodeJSON[T any](w http.ResponseWriter, r *http.Request) (T, error) {
 
 	// Reject the JSON literal null, which otherwise decodes successfully into a nil pointer.
 	if input == nil {
-		return zero, &requestError{
+		return zero, &model.RequestError{
 			Status:  http.StatusBadRequest,
 			Code:    "malformed_request",
 			Message: "request body must contain one JSON object",
@@ -126,7 +122,7 @@ func decodeJSON[T any](w http.ResponseWriter, r *http.Request) (T, error) {
 
 	// A second decode must reach EOF; otherwise the body contains another value or trailing data.
 	if err := decoder.Decode(&struct{}{}); !errors.Is(err, io.EOF) {
-		return zero, &requestError{
+		return zero, &model.RequestError{
 			Status:  http.StatusBadRequest,
 			Code:    "malformed_request",
 			Message: "request body must contain one JSON object",

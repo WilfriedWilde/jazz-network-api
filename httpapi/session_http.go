@@ -3,6 +3,7 @@ package httpapi
 import (
 	"jazz-network-api/model"
 	"jazz-network-api/service"
+	"jazz-network-api/validation"
 	"net/http"
 	"strings"
 	"time"
@@ -21,8 +22,8 @@ func (s *SessionHandler) Signup(w http.ResponseWriter, r *http.Request) {
 	}
 
 	input.Email = strings.ToLower(strings.TrimSpace(input.Email))
-	if !isValidEmail(input.Email) {
-		writeError(w, &requestError{
+	if !validation.IsValidEmail(input.Email) {
+		writeError(w, &model.RequestError{
 			Status:  http.StatusBadRequest,
 			Code:    "validation_error",
 			Message: "invalid email format",
@@ -62,8 +63,8 @@ func (s *SessionHandler) Login(w http.ResponseWriter, r *http.Request) {
 	}
 
 	input.Email = strings.ToLower(strings.TrimSpace(input.Email))
-	if !isValidEmail(input.Email) {
-		writeError(w, &requestError{
+	if !validation.IsValidEmail(input.Email) {
+		writeError(w, &model.RequestError{
 			Status:  http.StatusBadRequest,
 			Code:    "validation_error",
 			Message: "invalid email format",
