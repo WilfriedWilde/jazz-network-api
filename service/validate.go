@@ -1,9 +1,9 @@
 package service
 
 import (
-	"fmt"
 	"jazz-network-api/model"
 	"jazz-network-api/validation"
+	"net/http"
 	"strings"
 	"unicode"
 )
@@ -40,29 +40,34 @@ func validatePassword(password string) error {
 func validateOrganizerInput(input model.OrganizerInput) error {
 	var validationErr *model.ValidationError
 
-	// type in ["venue", "festival"], required
-	input.Type = strings.TrimSpace(input.Type)
-	if input.Type == "" {
+	addFieldErr := func(field, message string) {
+		if validationErr == nil {
+			validationErr = &model.ValidationError{
+				Status: http.StatusBadRequest,
+				Code:   "vallidation_error",
+			}
+		}
+
 		validationErr.Fields = append(validationErr.Fields, model.FieldError{
-			Field:   "type",
-			Message: "required",
+			Field:   field,
+			Message: message,
 		})
 	}
 
+	// type in ["venue", "festival"], required
+	input.Type = strings.TrimSpace(input.Type)
+	if input.Type == "" {
+		addFieldErr("type", "required")
+	}
+
 	if _, found := organizerTypes[input.Type]; !found {
-		validationErr.Fields = append(validationErr.Fields, model.FieldError{
-			Field:   "type",
-			Message: "should be either 'venue' or 'festival'",
-		})
+		addFieldErr("type", "should be either 'venue' or 'festival'")
 	}
 
 	// name required
 	input.Name = strings.TrimSpace(input.Name)
 	if input.Name == "" {
-		validationErr.Fields = append(validationErr.Fields, model.FieldError{
-			Field:   "name",
-			Message: "required",
-		})
+		addFieldErr("name", "required")
 	}
 
 	// country in existing real country, required
@@ -71,47 +76,53 @@ func validateOrganizerInput(input model.OrganizerInput) error {
 	// city required
 	input.City = strings.TrimSpace(input.City)
 	if input.City == "" {
-		validationErr.Fields = append(validationErr.Fields, model.FieldError{
-			Field:   "city",
-			Message: "required",
-		})
+		addFieldErr("city", "required")
 	}
 
 	// address required
 	input.Address = strings.TrimSpace(input.Address)
 	if input.Address == "" {
-		validationErr.Fields = append(validationErr.Fields, model.FieldError{
-			Field:   "address",
-			Message: "required",
-		})
+		addFieldErr("address", "required")
 	}
 
 	// websites valid format?
 	for _, w := range input.Websites {
-		// TODO: implement website format validation
-		fmt.Println(w)
+		if !validation.IsValidWebsite(w) {
+			addFieldErr("websites", "wrong format")
+		}
 	}
 
 	// emails valid format
 	for _, e := range input.Emails {
 		if !validation.IsValidEmail(e) {
-			validationErr.Fields = append(validationErr.Fields, model.FieldError{
-				Field:   "emails",
-				Message: "wrong format",
-			})
+			addFieldErr("emails", "wrong format")
 		}
 	}
 
 	// phone numbers valid format (maybe depending on country?), no letters
 	for _, p := range input.PhoneNumbers {
-		if !validation.IsValidPhoneNumber(e) {
-			validationErr.Fields = append(validationErr.Fields, model.FieldError{
-				Field:   "phone_numbers",
-				Message: "wrong format",
-			})
+		if !validation.IsValidPhoneNumber(p) {
+			addFieldErr("phone_numbers", "wrong format")
 		}
 	}
-	// -90º <= latitude <= 90º, float
-	// -180º <= longitude <= 180º, float
+
+	// -90º <= latitude <= 90º, required
+	if input.Latitude == nil {
+		addFieldErr("latitude", "required")
+	} else if *input.Latitude < -90. || *input.Latitude > 90. {
+		addFieldErr("latitude", "should be in range [-90, 90]")
+	}
+
+	// -180º <= longitude <= 180º, required
+	if input.Longitude == nil {
+		addFieldErr("longitude", "required")
+	} else if *input.Longitude < -180. || *input.Longitude > 180. {
+		addFieldErr("longitude", "should be in range [-180, 180]")
+	}
+
+	if validationErr == nil {
+		return nil
+	}
+
 	return validationErr
 }

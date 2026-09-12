@@ -31,8 +31,8 @@ type OrganizerInput struct {
 	ContactPersons   []string `json:"contact_persons"`
 	Schedule         string   `json:"schedule"`
 	Notes            string   `json:"notes"`
-	Latitude         float64  `json:"latitude"`
-	Longitude        float64  `json:"longitude"`
+	Latitude         *float64 `json:"latitude"`
+	Longitude        *float64 `json:"longitude"`
 	PublicVisibility bool     `json:"public_visibility"`
 }
 
@@ -84,8 +84,8 @@ func (o *OrganizerInput) ToOrganizerCreate() OrganizerCreate {
 		ContactPersons:   strings.Join(o.ContactPersons, ";"),
 		Schedule:         o.Schedule,
 		Notes:            o.Notes,
-		Latitude:         o.Latitude,
-		Longitude:        o.Longitude,
+		Latitude:         *o.Latitude,
+		Longitude:        *o.Longitude,
 		PublicVisibility: o.PublicVisibility,
 	}
 }
