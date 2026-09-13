@@ -17,9 +17,9 @@ config:
 request:
   variables:
     - name: baseURL
-      value: http://localhost:8080
+      value: http://localhost:8080/api
     - name: organizerID
-      value: "330"
+      value: "130"
 bundled: false
 extensions:
   bruno:

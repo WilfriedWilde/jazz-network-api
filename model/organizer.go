@@ -20,6 +20,7 @@ type Organizer struct {
 }
 
 type OrganizerInput struct {
+	UserID           int64    `json:"user_id"`
 	Type             string   `json:"type"`
 	Name             string   `json:"name"`
 	Country          string   `json:"country"`
