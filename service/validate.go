@@ -44,7 +44,7 @@ func validateOrganizerInput(input model.OrganizerInput) error {
 		if validationErr == nil {
 			validationErr = &model.ValidationError{
 				Status: http.StatusBadRequest,
-				Code:   "vallidation_error",
+				Code:   "validation_error",
 			}
 		}
 
@@ -101,7 +101,7 @@ func validateOrganizerInput(input model.OrganizerInput) error {
 
 	// phone numbers valid format (maybe depending on country?), no letters
 	for _, p := range input.PhoneNumbers {
-		if !validation.IsValidPhoneNumber(p) {
+		if !validation.IsValidPhoneNumber(p, input.Country) {
 			addFieldErr("phone_numbers", "wrong format")
 		}
 	}

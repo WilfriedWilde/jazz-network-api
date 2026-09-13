@@ -3,6 +3,8 @@ package validation
 import (
 	"net/mail"
 	"net/url"
+
+	"github.com/nyaruka/phonenumbers/v2"
 )
 
 func IsValidEmail(email string) bool {
@@ -10,9 +12,13 @@ func IsValidEmail(email string) bool {
 	return err == nil && address.Address == email
 }
 
-// TODO: implement phone number validation -> nyaruka/phonenumbers
-func IsValidPhoneNumber(p string) bool {
-	return true
+func IsValidPhoneNumber(p string, country string) bool {
+	num, err := phonenumbers.Parse(p, "")
+	if err != nil {
+		return false
+	}
+
+	return phonenumbers.IsValidNumber(num)
 }
 
 // TODO: implement website validation

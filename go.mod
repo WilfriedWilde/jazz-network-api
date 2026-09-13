@@ -6,3 +6,8 @@ require (
 	github.com/mattn/go-sqlite3 v1.14.49
 	golang.org/x/crypto v0.57.0
 )
+
+require (
+	github.com/nyaruka/phonenumbers/v2 v2.0.12 // indirect
+	google.golang.org/protobuf v1.36.11 // indirect
+)
