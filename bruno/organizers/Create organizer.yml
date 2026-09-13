@@ -1,0 +1,37 @@
+info:
+  name: Create organizer
+  type: http
+  seq: 3
+
+http:
+  method: POST
+  url: "{{baseURL}}/organizers"
+  headers:
+    - name: Content-Type
+      value: application/json
+  body:
+    type: json
+    data: |-
+      {
+        "type": "venue",
+        "country": "",
+        "city": "",
+        "address": "",
+        "websites": [],
+        "emails": [],
+        "phone_numbers": [],
+        "contact_persons": [],
+        "schedule": "",
+        "notes": "",
+        "latitude": 0.,
+        "longitude": 0.,
+        "public_visibility": false
+      }
+  auth: inherit
+
+settings:
+  encodeUrl: true
+  timeout: 0
+  followRedirects: true
+  maxRedirects: 5
+  forwardAuthorizationHeader: false
