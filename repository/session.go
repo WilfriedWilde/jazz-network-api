@@ -77,12 +77,18 @@ func (r *SessionRepository) GetUserBySession(ctx context.Context, db DBTX, sessi
 }
 
 func (r *SessionRepository) Delete(ctx context.Context, sessionUUID string) error {
-	if _, err := r.DB.ExecContext(ctx, deleteSessionQuery, sessionUUID); err != nil {
-		if errors.Is(err, sql.ErrNoRows) {
-			return ErrNotFound
-		}
-
+	result, err := r.DB.ExecContext(ctx, deleteSessionQuery, sessionUUID)
+	if err != nil {
 		return fmt.Errorf("delete session: %w", err)
+	}
+
+	rows, err := result.RowsAffected()
+	if err != nil {
+		return fmt.Errorf("delete session: rows affected: %w", err)
+	}
+
+	if rows == 0 {
+		return ErrNotFound
 	}
 
 	return nil

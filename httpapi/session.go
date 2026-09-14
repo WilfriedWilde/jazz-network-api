@@ -101,7 +101,7 @@ func (s *SessionHandler) Logout(w http.ResponseWriter, r *http.Request) {
 	// get sessionUUID
 	cookie, err := r.Cookie("session_UUID")
 	if err != nil {
-		w.WriteHeader(http.StatusOK)
+		w.WriteHeader(http.StatusNoContent)
 		return
 	}
 
