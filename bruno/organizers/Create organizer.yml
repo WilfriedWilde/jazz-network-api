@@ -1,0 +1,38 @@
+info:
+  name: Create organizer
+  type: http
+  seq: 3
+
+http:
+  method: POST
+  url: "{{baseURL}}/organizers"
+  headers:
+    - name: Content-Type
+      value: application/json
+  body:
+    type: json
+    data: |-
+      {
+        "type": "venue",
+        "name": "L’Astrada Marciac",
+        "country": "France",
+        "city": "Marciac",
+        "address": "53 Chem. de Ronde, 32230 Marciac, France",
+        "websites": ["https://lastrada-marciac.fr/"],
+        "emails": ["info@lastrada-marciac.fr"],
+        "phone_numbers": ["+33964473229"],
+        "contact_persons": ["Jean-Louis Guilhaumon"],
+        "schedule": "Fri, Sat, Sun",
+        "notes": "",
+        "latitude": 43.52587561775889,
+        "longitude": 0.16279435767019648,
+        "public_visibility": true
+      }
+  auth: inherit
+
+settings:
+  encodeUrl: true
+  timeout: 0
+  followRedirects: true
+  maxRedirects: 5
+  forwardAuthorizationHeader: false

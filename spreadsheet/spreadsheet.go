@@ -34,14 +34,14 @@ func UpdateSpreadSheet() {
 
 		organizers[rowID] = Organizer{
 			Type:           strings.TrimSpace(strings.ToLower(row[0])),
-			Name:           strings.TrimSpace(strings.ToLower(row[1])),
-			Country:        strings.TrimSpace(strings.ToLower(row[2])),
-			City:           strings.TrimSpace(strings.ToLower(row[3])),
-			Address:        strings.TrimSpace(strings.ToLower(row[4])),
+			Name:           strings.TrimSpace(row[1]),
+			Country:        strings.TrimSpace(row[2]),
+			City:           strings.TrimSpace(row[3]),
+			Address:        strings.TrimSpace(row[4]),
 			Websites:       strings.TrimSpace(strings.ToLower(row[5])),
 			Emails:         strings.TrimSpace(strings.ToLower(row[6])),
-			PhoneNumbers:   strings.TrimSpace(strings.ToLower(row[7])),
-			ContactPersons: strings.TrimSpace(strings.ToLower(row[8])),
+			PhoneNumbers:   strings.TrimSpace(row[7]),
+			ContactPersons: strings.TrimSpace(row[8]),
 			Schedule:       strings.TrimSpace(strings.ToLower(row[9])),
 			Notes:          strings.TrimSpace(row[10]),
 		}

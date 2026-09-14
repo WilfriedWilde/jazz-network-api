@@ -1,6 +1,7 @@
 package database
 
 import (
+	"context"
 	"database/sql"
 	_ "embed"
 	"fmt"
@@ -12,24 +13,24 @@ import (
 //go:embed init.sql
 var initMigration string
 
-func InitDB(path string) (*sql.DB, error) {
+func InitDB(ctx context.Context, path string) (*sql.DB, error) {
 	// check if database exists
 	exists := exists(path)
-	fmt.Println(exists)
+
 	// init database
-	db, err := openDB(fmt.Sprintf("%s?_foreign_keys=on", path))
+	db, err := openDB(ctx, fmt.Sprintf("%s?_foreign_keys=on", path))
 	if err != nil {
 		return nil, err
 	}
 
 	db.SetMaxOpenConns(1)
 
-	if err := createTables(db); err != nil {
+	if err := createTables(ctx, db); err != nil {
 		return nil, err
 	}
 
 	if !exists {
-		if err := seed(db); err != nil {
+		if err := seed(ctx, db); err != nil {
 			return nil, err
 		}
 	}
@@ -42,14 +43,14 @@ func exists(path string) bool {
 	return !os.IsNotExist(err)
 }
 
-func openDB(path string) (*sql.DB, error) {
+func openDB(ctx context.Context, path string) (*sql.DB, error) {
 	// connect to database
 	db, err := sql.Open("sqlite3", path)
 	if err != nil {
 		return nil, fmt.Errorf("error creating/opening database: %w", err)
 	}
 
-	if err := db.Ping(); err != nil {
+	if err := db.PingContext(ctx); err != nil {
 		return nil, fmt.Errorf("error establishing connection with database: %w", err)
 	}
 
@@ -58,8 +59,8 @@ func openDB(path string) (*sql.DB, error) {
 	return db, nil
 }
 
-func createTables(db *sql.DB) error {
-	if _, err := db.Exec(initMigration); err != nil {
+func createTables(ctx context.Context, db *sql.DB) error {
+	if _, err := db.ExecContext(ctx, initMigration); err != nil {
 		return fmt.Errorf("error creating tables: %w", err)
 	}
 
