@@ -13,7 +13,7 @@ import (
 
 const (
 	readOrganizerByIDQuery = `
-		SELECT *
+		SELECT id, type, name, country, city, address, websites, emails, phone_numbers, contact_persons, schedule, notes, latitude, longitude, public_visibility
 		FROM organizers
 		WHERE id = ?
 		AND (
@@ -24,7 +24,7 @@ const (
 	`
 
 	readAllOrganizersQuery = `
-		SELECT * 
+		SELECT id, type, name, country, city, address, websites, emails, phone_numbers, contact_persons, schedule, notes, latitude, longitude, public_visibility 
 		FROM organizers
 		WHERE public_visibility = TRUE
 			OR user_id = ?
@@ -35,7 +35,7 @@ const (
 	createOrganizerQuery = `
 		INSERT INTO organizers(user_id, type, name, country, city, address, websites, emails, phone_numbers, contact_persons, schedule, notes, latitude, longitude, public_visibility)
 		VALUES (?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?)
-		RETURNING id, type, name, country, city, address, websites, emails, phone_numbers, contact_persons, schedule, notes, latitude, longitude, public_visibility,
+		RETURNING id, type, name, country, city, address, websites, emails, phone_numbers, contact_persons, schedule, notes, latitude, longitude, public_visibility
 	`
 )
 
@@ -55,7 +55,7 @@ func (r *OrganizerRepository) Read(ctx context.Context, db DBTX, organizerID, us
 		&organizer.Country, &organizer.City, &organizer.Address,
 		&organizer.Websites, &organizer.Emails, &organizer.PhoneNumbers,
 		&organizer.ContactPersons, &organizer.Schedule, &organizer.Notes,
-		&organizer.Latitude, &organizer.Longitude,
+		&organizer.Latitude, &organizer.Longitude, &organizer.PublicVisibility,
 	); err != nil {
 		if errors.Is(err, sql.ErrNoRows) {
 			return model.Organizer{}, ErrNotFound
@@ -84,7 +84,7 @@ func (r *OrganizerRepository) ReadAll(ctx context.Context, db DBTX, userID int64
 			&o.Country, &o.City, &o.Address,
 			&o.Websites, &o.Emails, &o.PhoneNumbers,
 			&o.ContactPersons, &o.Schedule, &o.Notes,
-			&o.Latitude, &o.Longitude,
+			&o.Latitude, &o.Longitude, &o.PublicVisibility,
 		); err != nil {
 			return nil, fmt.Errorf("scan organizer: %w", err)
 		}
