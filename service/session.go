@@ -28,3 +28,11 @@ func (s *SessionService) Create(ctx context.Context, userID int64) (model.Sessio
 
 	return s.repository.Create(ctx, session)
 }
+
+func (s *SessionService) Delete(ctx context.Context, sessionUUID string) error {
+	if err := s.repository.Delete(ctx, sessionUUID); err != nil {
+		return convertToServiceError("delete", "session", err)
+	}
+
+	return nil
+}

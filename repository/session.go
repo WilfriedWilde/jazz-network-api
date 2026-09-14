@@ -22,6 +22,11 @@ const (
 		JOIN users AS u ON u.id = s.user_id
 		WHERE s.uuid = ? AND s.expires_at > ?
 	`
+
+	deleteSessionQuery = `
+		DELETE FROM sessions
+		WHERE uuid = ?
+	`
 )
 
 type SessionRepository struct {
@@ -69,4 +74,16 @@ func (r *SessionRepository) GetUserBySession(ctx context.Context, db DBTX, sessi
 	}
 
 	return user, nil
+}
+
+func (r *SessionRepository) Delete(ctx context.Context, sessionUUID string) error {
+	if _, err := r.DB.ExecContext(ctx, deleteSessionQuery, sessionUUID); err != nil {
+		if errors.Is(err, sql.ErrNoRows) {
+			return ErrNotFound
+		}
+
+		return fmt.Errorf("delete session: %w", err)
+	}
+
+	return nil
 }

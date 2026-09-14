@@ -21,7 +21,6 @@ func IsValidPhoneNumber(p string, country string) bool {
 	return phonenumbers.IsValidNumber(num)
 }
 
-// TODO: implement website validation
 func IsValidWebsite(w string) bool {
 	u, err := url.ParseRequestURI(w)
 	if err != nil {
