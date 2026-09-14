@@ -1,4 +1,4 @@
-package auth
+package middleware
 
 import (
 	"context"
@@ -19,7 +19,7 @@ func UserFromContext(ctx context.Context) (model.User, bool) {
 func AuthMiddleware(sessionRepo *repo.SessionRepository) func(http.Handler) http.Handler {
 	return func(next http.Handler) http.Handler {
 		return http.HandlerFunc(func(w http.ResponseWriter, r *http.Request) {
-			sessionUUID, err := getSessionID(r)
+			sessionUUID, err := GetSessionID(r)
 			if err != nil {
 				http.Error(w, "unauthorized", http.StatusUnauthorized)
 				return

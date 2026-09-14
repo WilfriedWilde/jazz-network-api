@@ -1,6 +1,7 @@
 package httpapi
 
 import (
+	"errors"
 	"jazz-network-api/model"
 	"jazz-network-api/service"
 	"jazz-network-api/validation"
@@ -94,4 +95,40 @@ func (s *SessionHandler) Login(w http.ResponseWriter, r *http.Request) {
 	})
 
 	writeJSON(w, http.StatusOK, user)
+}
+
+func (s *SessionHandler) Logout(w http.ResponseWriter, r *http.Request) {
+	// get sessionUUID
+	cookie, err := r.Cookie("session_UUID")
+	if err != nil {
+		w.WriteHeader(http.StatusNoContent)
+		return
+	}
+
+	// delete session
+	if err := s.SessionService.Delete(r.Context(), cookie.Value); err != nil {
+		if errors.Is(err, service.ErrNotFound) {
+			writeJSON(w, http.StatusUnauthorized, model.ErrBody{
+				Code:    "unauthorized",
+				Message: "session not found",
+			})
+		} else {
+			writeError(w, err)
+		}
+
+		return
+	}
+
+	// clear cookie
+	http.SetCookie(w, &http.Cookie{
+		Name:     "session_UUID",
+		Value:    "",
+		Expires:  time.Unix(0, 0),
+		HttpOnly: true,
+		SameSite: http.SameSiteLaxMode,
+		Path:     "/",
+	})
+
+	// write successful response
+	w.WriteHeader(http.StatusOK)
 }
