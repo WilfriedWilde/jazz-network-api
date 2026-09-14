@@ -120,6 +120,11 @@ func validateOrganizerInput(input model.OrganizerInput) error {
 		addFieldErr("longitude", "should be in range [-180, 180]")
 	}
 
+	// public visibility required
+	if input.PublicVisibility == nil {
+		addFieldErr("public_visibility", "required")
+	}
+
 	if validationErr == nil {
 		return nil
 	}

@@ -3,20 +3,21 @@ package model
 import "strings"
 
 type Organizer struct {
-	ID             int64
-	Type           string
-	Name           string
-	Country        string
-	City           string
-	Address        string
-	Websites       string
-	Emails         string
-	PhoneNumbers   string
-	ContactPersons string
-	Schedule       string
-	Notes          string
-	Latitude       float64
-	Longitude      float64
+	ID               int64
+	Type             string
+	Name             string
+	Country          string
+	City             string
+	Address          string
+	Websites         string
+	Emails           string
+	PhoneNumbers     string
+	ContactPersons   string
+	Schedule         string
+	Notes            string
+	Latitude         float64
+	Longitude        float64
+	PublicVisibility bool
 }
 
 type OrganizerInput struct {
@@ -33,10 +34,11 @@ type OrganizerInput struct {
 	Notes            string   `json:"notes"`
 	Latitude         *float64 `json:"latitude"`
 	Longitude        *float64 `json:"longitude"`
-	PublicVisibility bool     `json:"public_visibility"`
+	PublicVisibility *bool    `json:"public_visibility"`
 }
 
 type OrganizerCreate struct {
+	UserID           *int64
 	Type             string
 	Name             string
 	Country          string
@@ -50,7 +52,6 @@ type OrganizerCreate struct {
 	Notes            string
 	Latitude         float64
 	Longitude        float64
-	UserID           int64
 	PublicVisibility bool
 }
 
@@ -86,7 +87,7 @@ func (o *OrganizerInput) ToOrganizerCreate() OrganizerCreate {
 		Notes:            o.Notes,
 		Latitude:         *o.Latitude,
 		Longitude:        *o.Longitude,
-		PublicVisibility: o.PublicVisibility,
+		PublicVisibility: *o.PublicVisibility,
 	}
 }
 

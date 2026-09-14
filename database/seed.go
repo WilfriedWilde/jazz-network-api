@@ -32,6 +32,7 @@ func seed(ctx context.Context, db *sql.DB) error {
 	for userID := int64(1); userID < int64(3); userID++ {
 		for _, o := range organizers {
 			if _, err := organizerRepo.Create(ctx, db, model.OrganizerCreate{
+				UserID:           &userID,
 				Type:             o.Type,
 				Name:             o.Name,
 				Country:          o.Country,
@@ -45,7 +46,6 @@ func seed(ctx context.Context, db *sql.DB) error {
 				Notes:            o.Notes,
 				Latitude:         o.Latitude,
 				Longitude:        o.Longitude,
-				UserID:           userID,
 				PublicVisibility: false,
 			}); err != nil {
 				return err

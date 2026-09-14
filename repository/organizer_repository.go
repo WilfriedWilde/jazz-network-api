@@ -33,14 +33,9 @@ const (
 	`
 
 	createOrganizerQuery = `
-		INSERT INTO organizers(type, name, country, city, address, websites, emails, phone_numbers, contact_persons, schedule, notes, latitude, longitude)
-		VALUES (?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?)
-		RETURNING *
-	`
-
-	createUserOrganizerLinkQuery = `
-		INSERT INTO user_organizers(user_id, organizer_id)
-		VALUES (?, ?)
+		INSERT INTO organizers(user_id, type, name, country, city, address, websites, emails, phone_numbers, contact_persons, schedule, notes, latitude, longitude, public_visibility)
+		VALUES (?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?)
+		RETURNING id, type, name, country, city, address, websites, emails, phone_numbers, contact_persons, schedule, notes, latitude, longitude, public_visibility,
 	`
 )
 
@@ -107,15 +102,16 @@ func (r *OrganizerRepository) Create(ctx context.Context, db DBTX, o model.Organ
 	var organizer model.Organizer
 
 	if err := db.QueryRowContext(ctx, createOrganizerQuery,
-		o.Type, o.Name, o.Country, o.City, o.Address,
+		o.UserID, o.Type, o.Name, o.Country, o.City, o.Address,
 		o.Websites, o.Emails, o.PhoneNumbers, o.ContactPersons,
 		o.Schedule, o.Notes, o.Latitude, o.Longitude,
+		o.PublicVisibility,
 	).Scan(
 		&organizer.ID, &organizer.Type, &organizer.Name,
 		&organizer.Country, &organizer.City, &organizer.Address,
 		&organizer.Websites, &organizer.Emails, &organizer.PhoneNumbers,
 		&organizer.ContactPersons, &organizer.Schedule, &organizer.Notes,
-		&organizer.Latitude, &organizer.Longitude,
+		&organizer.Latitude, &organizer.Longitude, &organizer.PublicVisibility,
 	); err != nil {
 		if errors.Is(err, sqlite3.ErrConstraintUnique) {
 			return model.Organizer{}, ErrDuplicate
@@ -125,16 +121,4 @@ func (r *OrganizerRepository) Create(ctx context.Context, db DBTX, o model.Organ
 	}
 
 	return organizer, nil
-}
-
-func (r *OrganizerRepository) CreateUserOrganizerLink(ctx context.Context, db DBTX, link model.UserOrganizerCreate) error {
-	if _, err := db.ExecContext(ctx, createUserOrganizerLinkQuery, link.UserID, link.OrganizerID); err != nil {
-		if errors.Is(err, sqlite3.ErrConstraintUnique) {
-			return ErrDuplicate
-		}
-
-		return fmt.Errorf("create user-organizer link: %w", err)
-	}
-
-	return nil
 }

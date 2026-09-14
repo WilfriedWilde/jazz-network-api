@@ -1,6 +1,6 @@
 CREATE TABLE IF NOT EXISTS organizers (
     id INTEGER PRIMARY KEY,
-    user_id INTEGER REFERENCES users(id),
+    user_id INTEGER REFERENCES users(id) ON DELETE SET NULL,
     type TEXT NOT NULL CHECK (length(trim(type)) > 0),
     name TEXT NOT NULL CHECK (length(trim(name)) > 0),
     country TEXT NOT NULL CHECK (length(trim(country)) > 0),
@@ -34,17 +34,19 @@ CREATE TABLE IF NOT EXISTS sessions (
 
 CREATE TABLE IF NOT EXISTS organizer_contacts (
     id INTEGER PRIMARY KEY,
-    user_organizer_id INTEGER NOT NULL REFERENCES user_organizers(id) ON DELETE CASCADE,
+    user_id INTEGER NOT NULL REFERENCES users(id) ON DELETE CASCADE,
+    organizer_id INTEGER NOT NULL REFERENCES organizers(id) ON DELETE CASCADE,
     method TEXT NOT NULL CHECK (method IN ('email', 'phone', 'in_person')),
     status TEXT CHECK (status IN ('not_tried', 'contacted', 'confirmed', 'declined')),
     last_attempted_at TEXT NOT NULL DEFAULT CURRENT_TIMESTAMP,
     notes TEXT,
-    UNIQUE (user_organizer_id, method)
+    UNIQUE (user_id, organizer_id, method)
 );
 
 CREATE TABLE IF NOT EXISTS user_notes (
     id INTEGER PRIMARY KEY,
-    user_organizer_id INTEGER NOT NULL REFERENCES user_organizers(id) ON DELETE CASCADE,
+    user_id INTEGER NOT NULL REFERENCES users(id) ON DELETE CASCADE,
+    organizer_id INTEGER NOT NULL REFERENCES organizers(id) ON DELETE CASCADE,
     body TEXT NOT NULL,
     created_at TEXT
 );

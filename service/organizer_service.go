@@ -58,38 +58,14 @@ func (s *OrganizerService) Create(ctx context.Context, input model.OrganizerInpu
 		return model.Organizer{}, fmt.Errorf("get user from context")
 	}
 
-	isAdmin := user.AccessLevel == adminAccessLevel
-
-	var userID *int64
-	if !isAdmin {
-		userID = &user.ID
-	}
-
-	tx, err := s.repository.DB.BeginTx(ctx, nil)
-	if err != nil {
-		return model.Organizer{}, fmt.Errorf("begin transaction: %w", err)
-	}
-	defer tx.Rollback()
-
 	createOrganizer := input.ToOrganizerCreate()
-	createOrganizer.UserID = *userID
+	if user.AccessLevel != adminAccessLevel {
+		createOrganizer.UserID = &user.ID
+	}
 
-	organizer, err := s.repository.Create(ctx, tx, createOrganizer)
+	organizer, err := s.repository.Create(ctx, s.repository.DB, createOrganizer)
 	if err != nil {
 		return model.Organizer{}, convertToServiceError("create", "organizer", err)
-	}
-
-	if !isAdmin {
-		if err := s.repository.CreateUserOrganizerLink(ctx, tx, model.UserOrganizerCreate{
-			UserID:      *userID,
-			OrganizerID: organizer.ID,
-		}); err != nil {
-			return model.Organizer{}, convertToServiceError("create", "user_organizer", err)
-		}
-	}
-
-	if err := tx.Commit(); err != nil {
-		return model.Organizer{}, fmt.Errorf("commit transaction: %w", err)
 	}
 
 	return organizer, nil
