@@ -72,6 +72,12 @@ func validateOrganizerInput(input model.OrganizerInput) error {
 
 	// country in existing real country, required
 	input.Country = strings.TrimSpace(input.Country)
+	if input.Country == "" {
+		addFieldErr("country", "required")
+	}
+	if !validation.IsValidCountry(input.Country) {
+		addFieldErr("country", "invalid country")
+	}
 
 	// city required
 	input.City = strings.TrimSpace(input.City)
