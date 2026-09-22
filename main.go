@@ -22,8 +22,6 @@ func run() error {
 	signalCtx, stopSignals := signal.NotifyContext(context.Background(), os.Interrupt, syscall.SIGTERM, syscall.SIGINT)
 	defer stopSignals()
 
-	//s.UpdateSpreadSheet()
-
 	db, err := database.InitDB(signalCtx, dbPath)
 	if err != nil {
 		log.Fatal(err)
