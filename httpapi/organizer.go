@@ -56,3 +56,21 @@ func (h *OrganizerHandler) Create(w http.ResponseWriter, r *http.Request) {
 
 	writeJSON(w, http.StatusOK, organizer.ToOrganizerJSON())
 }
+
+func (h *OrganizerHandler) Delete(w http.ResponseWriter, r *http.Request) {
+	organizerID, err := parsePathID(r.PathValue("id"))
+	if err != nil {
+		writeError(w, err)
+		return
+	}
+
+	// TODO: parse strict query only accept force
+	// TODO: parse force
+	// TODO: handle writing error conflict
+	if err := h.Service.Delete(r.Context(), organizerID, force); err != nil {
+		writeError(w, err)
+		return
+	}
+
+	w.WriteHeader(http.StatusNoContent)
+}
