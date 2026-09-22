@@ -92,6 +92,7 @@ func validateOrganizerInput(input model.OrganizerInput) error {
 	for _, w := range input.Websites {
 		if !validation.IsValidWebsite(w) {
 			addFieldErr("websites", "wrong format")
+			break
 		}
 	}
 
@@ -99,6 +100,7 @@ func validateOrganizerInput(input model.OrganizerInput) error {
 	for _, e := range input.Emails {
 		if !validation.IsValidEmail(e) {
 			addFieldErr("emails", "wrong format")
+			break
 		}
 	}
 
@@ -106,6 +108,7 @@ func validateOrganizerInput(input model.OrganizerInput) error {
 	for _, p := range input.PhoneNumbers {
 		if !validation.IsValidPhoneNumber(p, input.Country) {
 			addFieldErr("phone_numbers", "wrong format")
+			break
 		}
 	}
 
