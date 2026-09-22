@@ -4,12 +4,15 @@ import (
 	"bufio"
 	"encoding/csv"
 	"fmt"
+	"io"
 	"log"
 	"os"
 	"slices"
 	"strconv"
 	"strings"
 	"time"
+
+	"github.com/biter777/countries"
 )
 
 func UpdateSpreadSheet() {
@@ -158,4 +161,61 @@ func UpdateSpreadSheet() {
 	if err := writer.Error(); err != nil {
 		log.Printf("error writing to jazz_network.csv: %s", err.Error())
 	}
+}
+
+func ToAlpha2() error {
+	file, err := os.OpenFile("spreadsheet/jazz_network.csv", os.O_RDWR, 0644)
+	if err != nil {
+		return fmt.Errorf("open csv: %w", err)
+	}
+
+	records, err := csv.NewReader(file).ReadAll()
+	if err != nil {
+		return fmt.Errorf("read csv records: %w", err)
+	}
+
+	var idxCountryField *int
+	for i, f := range records[0] {
+		if strings.TrimSpace(strings.ToLower(f)) == "country" {
+			idxCountryField = &i
+			break
+		}
+	}
+
+	if idxCountryField == nil {
+		return fmt.Errorf("country field missing in csv")
+	}
+
+	if _, err := file.Seek(0, io.SeekStart); err != nil {
+		return fmt.Errorf("seek to start: %w", err)
+	}
+
+	if err := file.Truncate(0); err != nil {
+		return fmt.Errorf("truncate file: %w", err)
+	}
+
+	writer := csv.NewWriter(file)
+	for i, r := range records {
+		if i == 0 {
+			if err := writer.Write(r); err != nil {
+				return fmt.Errorf("write to csv: %w", err)
+			}
+
+			continue
+		}
+
+		code := countries.ByName(strings.ToLower(r[*idxCountryField]))
+		r[*idxCountryField] = code.Alpha2()
+
+		if err := writer.Write(r); err != nil {
+			return fmt.Errorf("write to csv: %w", err)
+		}
+	}
+
+	writer.Flush()
+	if err := writer.Error(); err != nil {
+		return fmt.Errorf("flush csv: %w", err)
+	}
+
+	return nil
 }
