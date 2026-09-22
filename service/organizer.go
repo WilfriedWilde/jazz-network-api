@@ -70,3 +70,36 @@ func (s *OrganizerService) Create(ctx context.Context, input model.OrganizerInpu
 
 	return organizer, nil
 }
+
+func (s *OrganizerService) Delete(ctx context.Context, organizerID int64, force bool) error {
+	if force {
+		if err := s.repository.Delete(ctx, s.repository.DB, organizerID); err != nil {
+			return convertToServiceError("delete", "organizer", err)
+		}
+	}
+
+	tx, err := s.repository.DB.BeginTx(ctx, nil)
+	if err != nil {
+		return fmt.Errorf("begin tx delete organizer: %w", err)
+	}
+	defer func() error {
+		return tx.Rollback()
+	}()
+
+	// check if organizer is referenced by tour_stop
+	inUse, err := s.repository.OrganizerHasTourStops(ctx, tx, organizerID)
+	if err != nil {
+		return convertToServiceError("check existence", "tour_stops by organizer ID", err)
+	}
+
+	if inUse {
+		return ErrOrganizerConflict
+	}
+
+	// delete organizer
+	if err := s.repository.Delete(ctx, tx, organizerID); err != nil {
+		return convertToServiceError("delete", "organizer", err)
+	}
+
+	return tx.Commit()
+}

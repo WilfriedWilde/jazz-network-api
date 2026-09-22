@@ -37,6 +37,19 @@ const (
 		VALUES (?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?)
 		RETURNING id, type, name, country, city, address, websites, emails, phone_numbers, contact_persons, schedule, notes, latitude, longitude, public_visibility
 	`
+
+	deleteOrganizerQuery = `
+		DELETE FROM organizers
+		WHERE id = ?
+	`
+
+	organizerHasTourStopsQuery = `
+		SELECT EXISTS(
+			SELECT 1
+			FROM tour_stops
+			WHERE organizer_id = ?
+		)
+	`
 )
 
 type OrganizerRepository struct {
@@ -121,4 +134,25 @@ func (r *OrganizerRepository) Create(ctx context.Context, db DBTX, o model.Organ
 	}
 
 	return organizer, nil
+}
+
+func (r *OrganizerRepository) Delete(ctx context.Context, db DBTX, organizerID int64) error {
+	if _, err := db.ExecContext(ctx, deleteOrganizerQuery, organizerID); err != nil {
+		if errors.Is(err, sql.ErrNoRows) {
+			return ErrNotFound
+		}
+
+		return fmt.Errorf("delete organizer: %w", err)
+	}
+
+	return nil
+}
+
+func (r *OrganizerRepository) OrganizerHasTourStops(ctx context.Context, db DBTX, organizerID int64) (bool, error) {
+	var exists bool
+	if err := db.QueryRowContext(ctx, organizerHasTourStopsQuery, organizerID).Scan(&exists); err != nil {
+		return false, fmt.Errorf("check organizer has tour stops", err)
+	}
+
+	return exists, nil
 }
