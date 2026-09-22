@@ -15,7 +15,7 @@ http:
       {
         "type": "venue",
         "name": "L’Astrada Marciac",
-        "country": "France",
+        "country": "FR",
         "city": "Marciac",
         "address": "53 Chem. de Ronde, 32230 Marciac, France",
         "websites": ["https://lastrada-marciac.fr/"],

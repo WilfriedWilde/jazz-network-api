@@ -1,11 +1,32 @@
 package validation
 
 import (
+	"jazz-network-api/countries"
+	"log"
 	"net/mail"
 	"net/url"
 
 	"github.com/nyaruka/phonenumbers/v2"
 )
+
+func IsValidCountry(country string) bool {
+	allCountries, err := countries.GetCountries()
+	if err != nil {
+		log.Println(err.Error())
+		return false
+	}
+
+	byCode := make(map[string]struct{}, len(allCountries))
+	for _, c := range allCountries {
+		byCode[c.Code] = struct{}{}
+	}
+
+	if _, found := byCode[country]; !found {
+		return false
+	}
+
+	return true
+}
 
 func IsValidEmail(email string) bool {
 	address, err := mail.ParseAddress(email)

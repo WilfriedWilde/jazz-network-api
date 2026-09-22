@@ -58,9 +58,7 @@ func validateOrganizerInput(input model.OrganizerInput) error {
 	input.Type = strings.TrimSpace(input.Type)
 	if input.Type == "" {
 		addFieldErr("type", "required")
-	}
-
-	if _, found := organizerTypes[input.Type]; !found {
+	} else if _, found := organizerTypes[input.Type]; !found {
 		addFieldErr("type", "should be either 'venue' or 'festival'")
 	}
 
@@ -72,6 +70,11 @@ func validateOrganizerInput(input model.OrganizerInput) error {
 
 	// country in existing real country, required
 	input.Country = strings.TrimSpace(input.Country)
+	if input.Country == "" {
+		addFieldErr("country", "required")
+	} else if !validation.IsValidCountry(input.Country) {
+		addFieldErr("country", "invalid country")
+	}
 
 	// city required
 	input.City = strings.TrimSpace(input.City)
@@ -89,6 +92,7 @@ func validateOrganizerInput(input model.OrganizerInput) error {
 	for _, w := range input.Websites {
 		if !validation.IsValidWebsite(w) {
 			addFieldErr("websites", "wrong format")
+			break
 		}
 	}
 
@@ -96,6 +100,7 @@ func validateOrganizerInput(input model.OrganizerInput) error {
 	for _, e := range input.Emails {
 		if !validation.IsValidEmail(e) {
 			addFieldErr("emails", "wrong format")
+			break
 		}
 	}
 
@@ -103,6 +108,7 @@ func validateOrganizerInput(input model.OrganizerInput) error {
 	for _, p := range input.PhoneNumbers {
 		if !validation.IsValidPhoneNumber(p, input.Country) {
 			addFieldErr("phone_numbers", "wrong format")
+			break
 		}
 	}
 
