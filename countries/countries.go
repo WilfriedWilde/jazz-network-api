@@ -59,7 +59,7 @@ func GetCountriesJSON() (*os.File, error) {
 	return file, nil
 }
 
-func GetCountries() (map[string]Country, error) {
+func GetCountries() ([]Country, error) {
 	file, err := GetCountriesJSON()
 	if err != nil {
 		return nil, err
@@ -72,10 +72,5 @@ func GetCountries() (map[string]Country, error) {
 		return nil, fmt.Errorf("decode countries: %w", err)
 	}
 
-	byCode := make(map[string]Country, len(countries))
-	for _, c := range countries {
-		byCode[c.Code] = c
-	}
-
-	return byCode, nil
+	return countries, nil
 }

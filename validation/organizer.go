@@ -16,7 +16,12 @@ func IsValidCountry(country string) bool {
 		return false
 	}
 
-	if _, found := allCountries[country]; !found {
+	byCode := make(map[string]struct{}, len(allCountries))
+	for _, c := range allCountries {
+		byCode[c.Code] = struct{}{}
+	}
+
+	if _, found := byCode[country]; !found {
 		return false
 	}
 
