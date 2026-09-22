@@ -58,9 +58,7 @@ func validateOrganizerInput(input model.OrganizerInput) error {
 	input.Type = strings.TrimSpace(input.Type)
 	if input.Type == "" {
 		addFieldErr("type", "required")
-	}
-
-	if _, found := organizerTypes[input.Type]; !found {
+	} else if _, found := organizerTypes[input.Type]; !found {
 		addFieldErr("type", "should be either 'venue' or 'festival'")
 	}
 
@@ -74,8 +72,7 @@ func validateOrganizerInput(input model.OrganizerInput) error {
 	input.Country = strings.TrimSpace(input.Country)
 	if input.Country == "" {
 		addFieldErr("country", "required")
-	}
-	if !validation.IsValidCountry(input.Country) {
+	} else if !validation.IsValidCountry(input.Country) {
 		addFieldErr("country", "invalid country")
 	}
 

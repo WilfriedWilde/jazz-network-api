@@ -1,0 +1,30 @@
+info:
+  name: Missing required field on creation
+  type: http
+  seq: 1
+
+http:
+  method: POST
+  url: "{{baseURL}}/organizers"
+  headers:
+    - name: Content-Type
+      value: application/json
+  body:
+    type: json
+    data: |-
+      {
+        "websites": ["https://lastrada-marciac.fr/"],
+        "emails": ["info@lastrada-marciac.fr"],
+        "phone_numbers": ["+33964473229"],
+        "contact_persons": ["Jean-Louis Guilhaumon"],
+        "schedule": "Fri, Sat, Sun",
+        "notes": ""
+      }
+  auth: inherit
+
+settings:
+  encodeUrl: true
+  timeout: 0
+  followRedirects: true
+  maxRedirects: 5
+  forwardAuthorizationHeader: false

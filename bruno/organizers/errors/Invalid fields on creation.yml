@@ -1,0 +1,38 @@
+info:
+  name: Invalid fields on creation
+  type: http
+  seq: 2
+
+http:
+  method: POST
+  url: "{{baseURL}}/organizers"
+  headers:
+    - name: Content-Type
+      value: application/json
+  body:
+    type: json
+    data: |-
+      {
+        "type": "asasa",
+        "name": "L’Astrada Marciac",
+        "country": "WW",
+        "city": "Marciac",
+        "address": "53 Chem. de Ronde, 32230 Marciac, France",
+        "websites": ["lastrada-marciac"],
+        "emails": ["infolastrada-marciac"],
+        "phone_numbers": ["+339644732"],
+        "contact_persons": ["Jean-Louis Guilhaumon"],
+        "schedule": "Fri, Sat, Sun",
+        "notes": "",
+        "latitude": 143.52587561775889,
+        "longitude": 200.16279435767019648,
+        "public_visibility": true
+      }
+  auth: inherit
+
+settings:
+  encodeUrl: true
+  timeout: 0
+  followRedirects: true
+  maxRedirects: 5
+  forwardAuthorizationHeader: false
