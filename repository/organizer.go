@@ -5,6 +5,7 @@ import (
 	"database/sql"
 	"errors"
 	"fmt"
+	"strings"
 
 	"jazz-network-api/model"
 
@@ -62,7 +63,7 @@ const (
 
 	deleteOrganizerTravelsQuery = `
 		DELETE FROM travels
-		WHERE tour_stop_id IN (%s)
+		WHERE from_stop_id IN (%s) OR to_stop_id IN (%s)
 	`
 
 	deleteOrganizerAccommodationsQuery = `
@@ -212,9 +213,17 @@ func (r *OrganizerRepository) DeleteOrganizerTourStopFinances(ctx context.Contex
 }
 
 func (r *OrganizerRepository) DeleteOrganizerTravels(ctx context.Context, db DBTX, tourStopIDs []int64) error {
-	query, args := buildIDQueryArguments(deleteOrganizerTravelsQuery, tourStopIDs)
+	placeholders := make([]string, len(tourStopIDs))
+	args := make([]any, len(tourStopIDs))
 
-	if _, err := db.ExecContext(ctx, query, args...); err != nil {
+	for i, id := range tourStopIDs {
+		placeholders[i] = "?"
+		args[i] = id
+	}
+
+	query := fmt.Sprintf(deleteOrganizerTravelsQuery, strings.Join(placeholders, ", "), strings.Join(placeholders, ", "))
+
+	if _, err := db.ExecContext(ctx, query, append(args, args...)...); err != nil {
 		return fmt.Errorf("delete travels (organizer): %w", err)
 	}
 
