@@ -70,10 +70,13 @@ func (h *OrganizerHandler) Delete(w http.ResponseWriter, r *http.Request) {
 		return
 	}
 
-	force, err := parseBool(query["force"][0], "force")
-	if err != nil {
-		writeError(w, err)
-		return
+	var force bool
+	if len(query["force"]) > 0 {
+		force, err = parseBool(query["force"][0], "force")
+		if err != nil {
+			writeError(w, err)
+			return
+		}
 	}
 
 	organizerID, err := parsePathID(r.PathValue("id"))
