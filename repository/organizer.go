@@ -157,12 +157,18 @@ func (r *OrganizerRepository) Create(ctx context.Context, db DBTX, o model.Organ
 }
 
 func (r *OrganizerRepository) Delete(ctx context.Context, db DBTX, organizerID int64) error {
-	if _, err := db.ExecContext(ctx, deleteOrganizerQuery, organizerID); err != nil {
-		if errors.Is(err, sql.ErrNoRows) {
-			return ErrNotFound
-		}
-
+	result, err := db.ExecContext(ctx, deleteOrganizerQuery, organizerID)
+	if err != nil {
 		return fmt.Errorf("delete organizer: %w", err)
+	}
+
+	n, err := result.RowsAffected()
+	if err != nil {
+		return fmt.Errorf("delete organizer (rows affected): %w", err)
+	}
+
+	if n == 0 {
+		return ErrNotFound
 	}
 
 	return nil

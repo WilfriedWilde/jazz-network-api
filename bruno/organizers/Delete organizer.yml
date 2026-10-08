@@ -5,7 +5,11 @@ info:
 
 http:
   method: DELETE
-  url: "{{baseURL}}/organizers/224"
+  url: "{{baseURL}}/organizers/224?force=true"
+  params:
+    - name: force
+      value: "true"
+      type: query
   auth: inherit
 
 settings:
