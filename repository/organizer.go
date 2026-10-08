@@ -43,12 +43,31 @@ const (
 		WHERE id = ?
 	`
 
-	organizerHasTourStopsQuery = `
-		SELECT EXISTS(
-			SELECT 1
-			FROM tour_stops
-			WHERE organizer_id = ?
-		)
+	readTourStopIDsByOrganizerID = `
+		SELECT id
+		FROM tour_stops
+		WHERE organizer_id = ?
+	`
+
+	resetOrganizerTourStopsQuery = `
+		UPDATE tour_stops
+		SET organizer_id = NULL, type = 'free_day'
+		WHERE id IN (%s)
+	`
+
+	deleteOrganizerTourStopFinancesQuery = `
+		DELETE FROM tour_stop_finances
+		WHERE tour_stop_id IN (%s)
+	`
+
+	deleteOrganizerTravelsQuery = `
+		DELETE FROM travels
+		WHERE tour_stop_id IN (%s)
+	`
+
+	deleteOrganizerAccommodationsQuery = `
+		DELETE FROM accommodations
+		WHERE tour_stop_id IN (%s)
 	`
 )
 
@@ -148,11 +167,66 @@ func (r *OrganizerRepository) Delete(ctx context.Context, db DBTX, organizerID i
 	return nil
 }
 
-func (r *OrganizerRepository) OrganizerHasTourStops(ctx context.Context, db DBTX, organizerID int64) (bool, error) {
-	var exists bool
-	if err := db.QueryRowContext(ctx, organizerHasTourStopsQuery, organizerID).Scan(&exists); err != nil {
-		return false, fmt.Errorf("check organizer has tour stops", err)
+func (r *OrganizerRepository) ReadTourStopIDsByOrganizerID(ctx context.Context, db DBTX, organizerID int64) ([]int64, error) {
+	var ids []int64
+
+	rows, err := db.QueryContext(ctx, readTourStopIDsByOrganizerID, organizerID)
+	if err != nil {
+		return nil, fmt.Errorf("read tour_stop IDs by organizer ID: %w", err)
 	}
 
-	return exists, nil
+	for rows.Next() {
+		var id int64
+
+		if err := rows.Scan(&id); err != nil {
+			return nil, fmt.Errorf("scan tour_stop ID: %w", err)
+		}
+
+		ids = append(ids, id)
+	}
+	if err := rows.Err(); err != nil {
+		return nil, fmt.Errorf("iterate tour_stops: %w", err)
+	}
+
+	return ids, nil
+}
+
+func (r *OrganizerRepository) ResetOrganizerTourStops(ctx context.Context, db DBTX, tourStopIDs []int64) error {
+	query, args := buildIDQueryArguments(resetOrganizerTourStopsQuery, tourStopIDs)
+
+	if _, err := db.ExecContext(ctx, query, args...); err != nil {
+		return fmt.Errorf("reset organizer tour_stops: %w", err)
+	}
+
+	return nil
+}
+
+func (r *OrganizerRepository) DeleteOrganizerTourStopFinances(ctx context.Context, db DBTX, tourStopIDs []int64) error {
+	query, args := buildIDQueryArguments(deleteOrganizerTourStopFinancesQuery, tourStopIDs)
+
+	if _, err := db.ExecContext(ctx, query, args...); err != nil {
+		return fmt.Errorf("delete tour_stop_finances (organizer): %w", err)
+	}
+
+	return nil
+}
+
+func (r *OrganizerRepository) DeleteOrganizerTravels(ctx context.Context, db DBTX, tourStopIDs []int64) error {
+	query, args := buildIDQueryArguments(deleteOrganizerTravelsQuery, tourStopIDs)
+
+	if _, err := db.ExecContext(ctx, query, args...); err != nil {
+		return fmt.Errorf("delete travels (organizer): %w", err)
+	}
+
+	return nil
+}
+
+func (r *OrganizerRepository) DeleteOrganizerAccommodations(ctx context.Context, db DBTX, tourStopIDs []int64) error {
+	query, args := buildIDQueryArguments(deleteOrganizerAccommodationsQuery, tourStopIDs)
+
+	if _, err := db.ExecContext(ctx, query, args...); err != nil {
+		return fmt.Errorf("delete accommodations (organizer): %w", err)
+	}
+
+	return nil
 }
