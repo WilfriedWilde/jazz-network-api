@@ -39,6 +39,13 @@ func writeAPIerror(w http.ResponseWriter, err error) {
 			Message: "resource not found",
 		})
 
+	case errors.Is(err, service.ErrOrganizerConflict):
+		log.Print(err)
+		writeJSON(w, http.StatusConflict, model.ErrBody{
+			Code:    "conflict",
+			Message: "organizer referenced by one or more tour_stops",
+		})
+
 	default:
 		log.Println(err)
 		writeJSON(w, http.StatusInternalServerError, model.ErrBody{

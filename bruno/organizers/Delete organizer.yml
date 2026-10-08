@@ -1,0 +1,20 @@
+info:
+  name: Delete organizer
+  type: http
+  seq: 4
+
+http:
+  method: DELETE
+  url: "{{baseURL}}/organizers/224?force=true"
+  params:
+    - name: force
+      value: "true"
+      type: query
+  auth: inherit
+
+settings:
+  encodeUrl: true
+  timeout: 0
+  followRedirects: true
+  maxRedirects: 5
+  forwardAuthorizationHeader: false

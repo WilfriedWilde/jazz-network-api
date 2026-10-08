@@ -1,6 +1,7 @@
 package httpapi
 
 import (
+	"fmt"
 	"jazz-network-api/model"
 	s "jazz-network-api/service"
 	"net/http"
@@ -55,4 +56,39 @@ func (h *OrganizerHandler) Create(w http.ResponseWriter, r *http.Request) {
 	}
 
 	writeJSON(w, http.StatusOK, organizer.ToOrganizerJSON())
+}
+
+func (h *OrganizerHandler) Delete(w http.ResponseWriter, r *http.Request) {
+	query, err := parseStrictQuery(r, deleteKeysQuery)
+	if err != nil {
+		writeError(w, err)
+		return
+	}
+
+	if len(query["force"]) > 1 {
+		writeError(w, fmt.Errorf("only one 'force' query parameter allowed"))
+		return
+	}
+
+	var force bool
+	if len(query["force"]) > 0 {
+		force, err = parseBool(query["force"][0], "force")
+		if err != nil {
+			writeError(w, err)
+			return
+		}
+	}
+
+	organizerID, err := parsePathID(r.PathValue("id"))
+	if err != nil {
+		writeError(w, err)
+		return
+	}
+
+	if err := h.Service.Delete(r.Context(), organizerID, force); err != nil {
+		writeError(w, err)
+		return
+	}
+
+	w.WriteHeader(http.StatusNoContent)
 }

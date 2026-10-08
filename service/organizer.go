@@ -70,3 +70,52 @@ func (s *OrganizerService) Create(ctx context.Context, input model.OrganizerInpu
 
 	return organizer, nil
 }
+
+func (s *OrganizerService) Delete(ctx context.Context, organizerID int64, force bool) error {
+	tx, err := s.repository.DB.BeginTx(ctx, nil)
+	if err != nil {
+		return fmt.Errorf("begin tx delete organizer: %w", err)
+	}
+	defer func() error {
+		return tx.Rollback()
+	}()
+
+	// check if organizer is referenced by tour_stop
+	tourStopIDs, err := s.repository.ReadTourStopIDsByOrganizerID(ctx, tx, organizerID)
+	if err != nil {
+		return convertToServiceError("read", "tour_stops IDs by organizer ID", err)
+	}
+
+	if len(tourStopIDs) > 0 {
+		// on delete force:
+		// reset referencing tour_stops to organizer_id = NULL and type = free_day
+		// delete tour_stop referencers: tour_stop_finances, travels and accommodations
+		if force {
+			if err := s.repository.ResetOrganizerTourStops(ctx, tx, tourStopIDs); err != nil {
+				return convertToServiceError("update", "tour_stops (organizer)", err)
+			}
+
+			if err := s.repository.DeleteOrganizerTourStopFinances(ctx, tx, tourStopIDs); err != nil {
+				return convertToServiceError("delete", "tour_stop_finances by tour_stops IDs (organizer)", err)
+			}
+
+			if err := s.repository.DeleteOrganizerTravels(ctx, tx, tourStopIDs); err != nil {
+				return convertToServiceError("delete", "travels by tour_stops IDs (organizer)", err)
+			}
+
+			if err := s.repository.DeleteOrganizerAccommodations(ctx, tx, tourStopIDs); err != nil {
+				return convertToServiceError("delete", "accommodations by tour_stops IDs (organizer)", err)
+			}
+		} else {
+			return ErrOrganizerConflict
+		}
+
+	}
+
+	// delete organizer
+	if err := s.repository.Delete(ctx, tx, organizerID); err != nil {
+		return convertToServiceError("delete", "organizer", err)
+	}
+
+	return tx.Commit()
+}

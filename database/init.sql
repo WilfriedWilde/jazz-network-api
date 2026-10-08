@@ -61,7 +61,7 @@ CREATE TABLE IF NOT EXISTS tours (
 
 CREATE TABLE IF NOT EXISTS tour_stops (
     id INTEGER PRIMARY KEY,
-    tour_id INTEGER NOT NULL REFERENCES tours(id),
+    tour_id INTEGER NOT NULL REFERENCES tours(id) ON DELETE CASCADE,
     organizer_id INTEGER REFERENCES organizers(id),
     type TEXT NOT NULL CHECK (type IN ('gig', 'free_day', 'travel_day')),
     stop_order INTEGER NOT NULL,
@@ -75,7 +75,7 @@ CREATE TABLE IF NOT EXISTS tour_stops (
 
 CREATE TABLE IF NOT EXISTS tour_stop_finances (
   id INTEGER PRIMARY KEY,
-  tour_stop_id INTEGER NOT NULL REFERENCES tour_stops(id),
+  tour_stop_id INTEGER NOT NULL REFERENCES tour_stops(id) ON DELETE CASCADE,
   category TEXT NOT NULL CHECK (category IN ('gig_fee', 'merch', 'food', 'transport', 'other')),
   amount REAL NOT NULL DEFAULT 0,
   notes TEXT
@@ -83,8 +83,8 @@ CREATE TABLE IF NOT EXISTS tour_stop_finances (
 
 CREATE TABLE IF NOT EXISTS travels (
     id INTEGER PRIMARY KEY,
-    from_stop_id INTEGER NOT NULL REFERENCES tour_stops(id),
-    to_stop_id INTEGER NOT NULL REFERENCES tour_stops(id),
+    from_stop_id INTEGER NOT NULL REFERENCES tour_stops(id) ON DELETE CASCADE,
+    to_stop_id INTEGER NOT NULL REFERENCES tour_stops(id) ON DELETE CASCADE,
     mean TEXT NOT NULL CHECK (mean IN ('car', 'taxi', 'bus', 'train', 'plane')),
     cost REAL NOT NULL CHECK (cost >= 0),
     booking_status TEXT CHECK (booking_status IN ('pending', 'booked')),
@@ -93,7 +93,7 @@ CREATE TABLE IF NOT EXISTS travels (
 
 CREATE TABLE IF NOT EXISTS accommodations (
     id INTEGER PRIMARY KEY,
-    tour_stop_id INTEGER NOT NULL REFERENCES tour_stops(id),
+    tour_stop_id INTEGER NOT NULL REFERENCES tour_stops(id) ON DELETE CASCADE,
     type TEXT NOT NULL CHECK (type IN ('hotel', 'hostel', 'airbnb', 'guesthouse', 'apartment', 'host_family', 'other')),
     cost REAL NOT NULL CHECK (cost >= 0),
     booking_status TEXT CHECK (booking_status IN ('pending', 'booked')),
