@@ -82,7 +82,6 @@ func (h *OrganizerHandler) Delete(w http.ResponseWriter, r *http.Request) {
 		return
 	}
 
-	// TODO: handle writing error conflict
 	if err := h.Service.Delete(r.Context(), organizerID, force); err != nil {
 		writeError(w, err)
 		return
