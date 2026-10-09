@@ -119,3 +119,25 @@ func (s *OrganizerService) Delete(ctx context.Context, organizerID int64, force 
 
 	return tx.Commit()
 }
+
+func (s *OrganizerService) Update(ctx context.Context, id int64, update model.OrganizerUpdate) (model.Organizer, error) {
+	if err := validateOrganizerUpdate(update); err != nil {
+		return model.Organizer{}, err
+	}
+
+	exists, err := s.repository.Exists(ctx, s.repository.DB, id)
+	if err != nil {
+		return model.Organizer{}, convertToServiceError("check existence", "organizer", err)
+	}
+
+	if !exists {
+		return model.Organizer{}, ErrNotFound
+	}
+
+	organizer, err := s.repository.Update(ctx, s.repository.DB, id, update)
+	if err != nil {
+		return model.Organizer{}, convertToServiceError("update", "organizer", err)
+	}
+
+	return organizer, nil
+}

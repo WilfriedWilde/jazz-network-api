@@ -15,6 +15,7 @@ var (
 	ErrPasswordTooWeak    = errors.New("service: password too weak")
 	ErrInvalidCredentials = errors.New("service: invalid email or password")
 	ErrOrganizerConflict  = errors.New("service: organizer referenced by one or more tour_stops")
+	ErrNothingToUpdate    = errors.New("service: nothing to update")
 )
 
 func convertToServiceError(operation, resource string, err error) error {
@@ -26,6 +27,9 @@ func convertToServiceError(operation, resource string, err error) error {
 
 	case errors.Is(err, repository.ErrDuplicate):
 		serviceErr = ErrDuplicate
+
+	case errors.Is(err, repository.ErrNothingToUpdate):
+		serviceErr = ErrNothingToUpdate
 	}
 
 	if serviceErr != nil {

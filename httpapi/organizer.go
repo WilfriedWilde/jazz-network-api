@@ -92,3 +92,25 @@ func (h *OrganizerHandler) Delete(w http.ResponseWriter, r *http.Request) {
 
 	w.WriteHeader(http.StatusNoContent)
 }
+
+func (h *OrganizerHandler) Update(w http.ResponseWriter, r *http.Request) {
+	organizerID, err := parsePathID(r.PathValue("id"))
+	if err != nil {
+		writeError(w, err)
+		return
+	}
+
+	update, err := decodeJSON[model.OrganizerUpdate](w, r)
+	if err != nil {
+		writeError(w, err)
+		return
+	}
+
+	organizer, err := h.Service.Update(r.Context(), organizerID, update)
+	if err != nil {
+		writeError(w, err)
+		return
+	}
+
+	writeJSON(w, http.StatusOK, organizer.ToOrganizerJSON())
+}

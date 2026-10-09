@@ -70,6 +70,21 @@ const (
 		DELETE FROM accommodations
 		WHERE tour_stop_id IN (%s)
 	`
+
+	existOrganizerQuery = `
+		SELECT EXISTS (
+			SELECT 1
+			FROM organizers
+			WHERE id = ?
+		)
+	`
+
+	updateOrganizerQuery = `
+		UPDATE organizers
+		SET %s
+		WHERE id = ?
+		RETURNING id, type, name, country, city, address, websites, emails, phone_numbers, contact_persons, schedule, notes, latitude, longitude, public_visibility
+	`
 )
 
 type OrganizerRepository struct {
@@ -151,6 +166,101 @@ func (r *OrganizerRepository) Create(ctx context.Context, db DBTX, o model.Organ
 		}
 
 		return model.Organizer{}, fmt.Errorf("create organizer: %w", err)
+	}
+
+	return organizer, nil
+}
+
+func (r *OrganizerRepository) Exists(ctx context.Context, db DBTX, id int64) (bool, error) {
+	var exists bool
+	err := db.QueryRowContext(ctx, existOrganizerQuery, id).Scan(&exists)
+	return exists, err
+}
+
+func (r *OrganizerRepository) Update(ctx context.Context, db DBTX, id int64, o model.OrganizerUpdate) (model.Organizer, error) {
+	var organizer model.Organizer
+	var placeholders []string
+	var args []any
+
+	addColumnValue := func(col string, val any) {
+		placeholders = append(placeholders, col+" = ?")
+		args = append(args, val)
+	}
+
+	if o.Type != nil {
+		addColumnValue("type", *o.Type)
+	}
+
+	if o.Name != nil {
+		addColumnValue("name", *o.Name)
+	}
+
+	if o.Country != nil {
+		addColumnValue("country", *o.Country)
+	}
+
+	if o.City != nil {
+		addColumnValue("city", *o.City)
+	}
+
+	if o.Address != nil {
+		addColumnValue("address", *o.Address)
+	}
+
+	if o.Websites != nil {
+		addColumnValue("websites", strings.Join(o.Websites, ";"))
+	}
+
+	if o.Emails != nil {
+		addColumnValue("emails", strings.Join(o.Emails, ";"))
+	}
+
+	if o.PhoneNumbers != nil {
+		addColumnValue("phone_numbers", strings.Join(o.PhoneNumbers, ";"))
+	}
+
+	if o.ContactPersons != nil {
+		addColumnValue("contact_persons", strings.Join(o.ContactPersons, ";"))
+	}
+
+	if o.Schedule != nil {
+		addColumnValue("schedule", o.Schedule)
+	}
+
+	if o.Notes != nil {
+		addColumnValue("notes", o.Notes)
+	}
+
+	if o.Latitude != nil {
+		addColumnValue("notes", o.Latitude)
+	}
+
+	if o.Longitude != nil {
+		addColumnValue("longitude", o.Longitude)
+	}
+
+	if o.PublicVisibility != nil {
+		addColumnValue("public_visibility", o.PublicVisibility)
+	}
+
+	if len(args) == 0 {
+		return model.Organizer{}, ErrNothingToUpdate
+	}
+
+	query := fmt.Sprintf(updateOrganizerQuery, strings.Join(placeholders, ", "))
+
+	if err := db.QueryRowContext(ctx, query, append(args, id)...).Scan(
+		&organizer.ID, &organizer.Type, &organizer.Name,
+		&organizer.Country, &organizer.City, &organizer.Address,
+		&organizer.Websites, &organizer.Emails, &organizer.PhoneNumbers,
+		&organizer.ContactPersons, &organizer.Schedule, &organizer.Notes,
+		&organizer.Latitude, &organizer.Longitude, &organizer.PublicVisibility,
+	); err != nil {
+		if errors.Is(err, sqlite3.ErrConstraintUnique) {
+			return model.Organizer{}, ErrDuplicate
+		}
+
+		return model.Organizer{}, fmt.Errorf("update organizer: %w", err)
 	}
 
 	return organizer, nil
