@@ -243,9 +243,13 @@ func (r *OrganizerRepository) Update(ctx context.Context, db DBTX, id int64, o m
 		addColumnValue("public_visibility", o.PublicVisibility)
 	}
 
+	if len(args) == 0 {
+		return model.Organizer{}, ErrNothingToUpdate
+	}
+
 	query := fmt.Sprintf(updateOrganizerQuery, strings.Join(placeholders, ", "))
 
-	if err := db.QueryRowContext(ctx, query, args...).Scan(
+	if err := db.QueryRowContext(ctx, query, append(args, id)...).Scan(
 		&organizer.ID, &organizer.Type, &organizer.Name,
 		&organizer.Country, &organizer.City, &organizer.Address,
 		&organizer.Websites, &organizer.Emails, &organizer.PhoneNumbers,
@@ -256,7 +260,7 @@ func (r *OrganizerRepository) Update(ctx context.Context, db DBTX, id int64, o m
 			return model.Organizer{}, ErrDuplicate
 		}
 
-		return model.Organizer{}, fmt.Errorf("create organizer: %w", err)
+		return model.Organizer{}, fmt.Errorf("update organizer: %w", err)
 	}
 
 	return organizer, nil

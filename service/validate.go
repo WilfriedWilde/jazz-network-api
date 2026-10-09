@@ -221,13 +221,17 @@ func validateOrganizerUpdate(input model.OrganizerUpdate) error {
 	}
 
 	// -90º <= latitude <= 90º
-	if input.Latitude != nil && *input.Latitude < -90. || *input.Latitude > 90. {
-		addFieldErr("latitude", "should be in range [-90, 90]")
+	if input.Latitude != nil {
+		if *input.Latitude < -90. || *input.Latitude > 90. {
+			addFieldErr("latitude", "should be in range [-90, 90]")
+		}
 	}
 
 	// -180º <= longitude <= 180º
-	if input.Longitude != nil && *input.Longitude < -180. || *input.Longitude > 180. {
-		addFieldErr("longitude", "should be in range [-180, 180]")
+	if input.Longitude != nil {
+		if *input.Longitude < -180. || *input.Longitude > 180. {
+			addFieldErr("longitude", "should be in range [-180, 180]")
+		}
 	}
 
 	if validationErr == nil {

@@ -46,6 +46,13 @@ func writeAPIerror(w http.ResponseWriter, err error) {
 			Message: "organizer referenced by one or more tour_stops",
 		})
 
+	case errors.Is(err, service.ErrNothingToUpdate):
+		log.Print(err)
+		writeJSON(w, http.StatusBadRequest, model.ErrBody{
+			Code:    "nothing_to_update",
+			Message: "update request body must not be empty",
+		})
+
 	default:
 		log.Println(err)
 		writeJSON(w, http.StatusInternalServerError, model.ErrBody{

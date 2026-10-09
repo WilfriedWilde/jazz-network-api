@@ -14,7 +14,7 @@ CREATE TABLE IF NOT EXISTS organizers (
     notes TEXT,
     latitude REAL NOT NULL CHECK (latitude >= -90 AND latitude <= 90),
     longitude REAL NOT NULL CHECK (longitude >= -180 AND longitude <= 180),
-    public_visibility BOOLEAN NOT NULL DEFAULT FALSE
+    public_visibility BOOLEAN NOT NULL DEFAULT FALSE,
     UNIQUE(name, city)
 );
 
