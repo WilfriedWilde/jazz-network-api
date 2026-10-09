@@ -63,8 +63,8 @@ CREATE TABLE IF NOT EXISTS tours (
 CREATE TABLE IF NOT EXISTS tour_stops (
     id INTEGER PRIMARY KEY,
     tour_id INTEGER NOT NULL REFERENCES tours(id) ON DELETE CASCADE,
-    organizer_id INTEGER REFERENCES organizers(id),
-    type TEXT NOT NULL CHECK (type IN ('gig', 'free_day', 'travel_day')),
+    organizer_id INTEGER REFERENCES organizers(id) DEFAULT SET NULL,
+    type TEXT NOT NULL DEFAULT 'free_day' CHECK (type IN ('gig', 'free_day', 'travel_day')),
     stop_order INTEGER NOT NULL,
     notes TEXT,
     CHECK (
