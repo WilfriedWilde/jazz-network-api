@@ -5,6 +5,7 @@ import (
 	"jazz-network-api/validation"
 	"net/http"
 	"strings"
+	"time"
 	"unicode"
 )
 
@@ -268,21 +269,25 @@ func validateTourInput(input model.TourInput) error {
 	input.Start = strings.TrimSpace(input.Start)
 	if input.Start == "" {
 		addFieldErr("start", "required")
-	} else if !validation.IsValidDate(input.Start) {
-		addFieldErr("start date", "date format should be YYYY-MM-DD")
+	} else if ok, msg := validation.IsValidDate(input.Start); !ok {
+		addFieldErr("start date", msg)
 	}
 
 	// end required
 	input.End = strings.TrimSpace(input.End)
 	if input.End == "" {
 		addFieldErr("end", "required")
-	} else if validation.IsValidDate(input.Start) {
-		if !validation.IsValidDate(input.End) {
-			addFieldErr("end date", "date format should be YYYY-MM-DD")
+	} else if okStart, _ := validation.IsValidDate(input.Start); okStart {
+		if okEnd, msg := validation.IsValidDate(input.End); !okEnd {
+			addFieldErr("end date", msg)
 		} else {
-			// TODO: check if end >= start
+			// check if end >= start
+			startDate, _ := time.Parse(time.DateOnly, input.Start)
+			endDate, _ := time.Parse(time.DateOnly, input.End)
 
-			addFieldErr("end date", "end date should be the same day or after start date")
+			if endDate.Before(startDate) {
+				addFieldErr("end date", "should be on the same day or after start date")
+			}
 		}
 	}
 

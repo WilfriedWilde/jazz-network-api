@@ -21,22 +21,40 @@ func (s *TourService) Create(ctx context.Context, input model.TourInput) (model.
 		return model.Tour{}, err
 	}
 
-	// TODO: everything should be in tx
-	// first create tour, then corresponding tourstops
+	tx, err := s.repository.DB.BeginTx(ctx, nil)
+	if err != nil {
+		return model.Tour{}, fmt.Errorf("begin transaction")
+	}
+	defer func() error {
+		return tx.Rollback()
+	}()
+
 	user, ok := m.UserFromContext(ctx)
 	if !ok {
 		return model.Tour{}, fmt.Errorf("get user from context")
 	}
 
-	// TODO: implement ToTourCreate()
-	createTour := input.ToTourCreate()
-	if user.AccessLevel != adminAccessLevel {
-		createTour.UserID = &user.ID
+	tourCreate := model.TourCreate{
+		UserID: user.ID,
+		Name:   input.Name,
+		Start:  input.Start,
+		End:    input.End,
 	}
 
-	tour, err := s.repository.Create(ctx, s.repository.DB, createTour)
+	tour, err := s.repository.Create(ctx, tx, tourCreate)
 	if err != nil {
 		return model.Tour{}, convertToServiceError("create", "tour", err)
+	}
+
+	numTourStops := getNumTourStops(tour)
+
+	tour.Stops, err = s.repository.CreateTourStops(ctx, tx, numTourStops, tour.ID)
+	if err != nil {
+		return model.Tour{}, convertToServiceError("create", "tour's tour_stops", err)
+	}
+
+	if err := tx.Commit(); err != nil {
+		return model.Tour{}, fmt.Errorf("commit transaction")
 	}
 
 	return tour, nil

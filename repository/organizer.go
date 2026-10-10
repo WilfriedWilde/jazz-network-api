@@ -35,7 +35,7 @@ const (
 
 	createOrganizerQuery = `
 		INSERT INTO organizers(user_id, type, name, country, city, address, websites, emails, phone_numbers, contact_persons, schedule, notes, latitude, longitude, public_visibility)
-		VALUES (?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?)
+		VALUES(?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?)
 		RETURNING id, type, name, country, city, address, websites, emails, phone_numbers, contact_persons, schedule, notes, latitude, longitude, public_visibility
 	`
 
