@@ -6,37 +6,41 @@ import (
 	"errors"
 	"fmt"
 	"jazz-network-api/model"
+
+	"github.com/mattn/go-sqlite3"
 )
 
 const (
 	createTourQuery = `
-		INSERT INTO tours (user_id, name, start, end)
+		INSERT INTO tours (user_id, name, start_date, end_date)
 		VALUES(?, ?, ?, ?)
-		RETURNING id, name, start, end
+		RETURNING id, name, start_date, end_date
 	`
 
 	createToursTourStopsQuery = `
-		INSERT INTO tour_stops (tour_id, type, stop_order)
-		VALUES(?, ?, ?)
+		INSERT INTO tour_stops (tour_id, type, stop_order, notes)
+		VALUES(?, ?, ?, ?)
 		RETURNING *
 	`
 
 	readAllToursQuery = `
-		SELECT id, name, start, end
+		SELECT id, name, start_date, end_date
 		FROM tours
 		WHERE user_id = ?
 		ORDER BY id ASC
 	`
 
 	readAllTourStopsByUserIDQuery = `
-		SELECT *
-		FROM tour_stops
-		WHERE user_id = ?
-		ORDER BY id ASC
+		SELECT ts.id, ts.tour_id, ts.organizer_id, ts.type, ts.stop_order, ts.notes
+		FROM tour_stops AS ts
+		JOIN tours AS t
+		ON t.id = ts.tour_id
+		WHERE t.user_id = ?
+		ORDER BY ts.stop_order ASC
 	`
 
 	readTourByIDQuery = `
-		SELECT id, name, start, end
+		SELECT id, name, start_date, end_date
 		FROM tours
 		WHERE id = ?
 	`
@@ -45,7 +49,7 @@ const (
 		SELECT *
 		FROM tour_stops
 		WHERE tour_id = ?
-		ORDER BY id ASC
+		ORDER BY stop_order ASC
 	`
 )
 
@@ -63,13 +67,18 @@ func (r *TourRepository) Create(ctx context.Context, db DBTX, t model.TourCreate
 	if err := db.QueryRowContext(ctx, createTourQuery, t.UserID, t.Name, t.Start, t.End).Scan(
 		&tour.ID, &tour.Name, &tour.Start, &tour.End,
 	); err != nil {
+		var sqliteErr sqlite3.Error
+		if errors.As(err, &sqliteErr) && sqliteErr.ExtendedCode == sqlite3.ErrConstraintUnique {
+			return model.Tour{}, ErrDuplicate
+		}
+
 		return model.Tour{}, fmt.Errorf("create tour: %w", err)
 	}
 
 	return tour, nil
 }
 
-func (r *TourRepository) CreateTourStops(ctx context.Context, tx *sql.Tx, numTourStops int, tourID int64) ([]model.TourStop, error) {
+func (r *TourRepository) CreateTourStops(ctx context.Context, tx *sql.Tx, numTourStops int, t model.TourStopCreate) ([]model.TourStop, error) {
 	tourStops := make([]model.TourStop, numTourStops)
 
 	stmt, err := tx.PrepareContext(ctx, createToursTourStopsQuery)
@@ -81,7 +90,7 @@ func (r *TourRepository) CreateTourStops(ctx context.Context, tx *sql.Tx, numTou
 	for i := range numTourStops {
 		var stop model.TourStop
 
-		if err := stmt.QueryRowContext(ctx, tourID, "free_day", i).Scan(
+		if err := stmt.QueryRowContext(ctx, t.TourID, t.Type, i, t.Notes).Scan(
 			&stop.ID, &stop.TourID, &stop.OrganizerID,
 			&stop.Type, &stop.StopOrder, &stop.Notes,
 		); err != nil {

@@ -48,7 +48,10 @@ func (s *TourService) Create(ctx context.Context, input model.TourInput) (model.
 
 	numTourStops := getNumTourStops(tour)
 
-	tour.Stops, err = s.repository.CreateTourStops(ctx, tx, numTourStops, tour.ID)
+	tour.Stops, err = s.repository.CreateTourStops(ctx, tx, numTourStops, model.TourStopCreate{
+		TourID: tour.ID,
+		Type:   "free_day",
+	})
 	if err != nil {
 		return model.Tour{}, convertToServiceError("create", "tour's tour_stops", err)
 	}

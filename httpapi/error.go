@@ -39,6 +39,13 @@ func writeAPIerror(w http.ResponseWriter, err error) {
 			Message: "resource not found",
 		})
 
+	case errors.Is(err, service.ErrDuplicate):
+		log.Print(err)
+		writeJSON(w, http.StatusConflict, model.ErrBody{
+			Code:    "duplicate",
+			Message: "entity already existing",
+		})
+
 	case errors.Is(err, service.ErrOrganizerConflict):
 		log.Print(err)
 		writeJSON(w, http.StatusConflict, model.ErrBody{

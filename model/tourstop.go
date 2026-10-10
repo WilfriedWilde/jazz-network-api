@@ -8,3 +8,11 @@ type TourStop struct {
 	StopOrder   int     `json:"stop_order"`
 	Notes       *string `json:"notes"`
 }
+
+type TourStopCreate struct {
+	TourID      int64
+	OrganizerID int64
+	Type        string
+	StopOrder   int
+	Notes       string
+}
