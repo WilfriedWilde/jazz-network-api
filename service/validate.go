@@ -240,3 +240,55 @@ func validateOrganizerUpdate(input model.OrganizerUpdate) error {
 
 	return validationErr
 }
+
+func validateTourInput(input model.TourInput) error {
+	var validationErr *model.ValidationError
+
+	addFieldErr := func(field, message string) {
+		if validationErr == nil {
+			validationErr = &model.ValidationError{
+				Status: http.StatusBadRequest,
+				Code:   "validation_error",
+			}
+		}
+
+		validationErr.Fields = append(validationErr.Fields, model.FieldError{
+			Field:   field,
+			Message: message,
+		})
+	}
+
+	// name required
+	input.Name = strings.TrimSpace(input.Name)
+	if input.Name == "" {
+		addFieldErr("name", "required")
+	}
+
+	// start required
+	input.Start = strings.TrimSpace(input.Start)
+	if input.Start == "" {
+		addFieldErr("start", "required")
+	} else if !validation.IsValidDate(input.Start) {
+		addFieldErr("start date", "date format should be YYYY-MM-DD")
+	}
+
+	// end required
+	input.End = strings.TrimSpace(input.End)
+	if input.End == "" {
+		addFieldErr("end", "required")
+	} else if validation.IsValidDate(input.Start) {
+		if !validation.IsValidDate(input.End) {
+			addFieldErr("end date", "date format should be YYYY-MM-DD")
+		} else {
+			// TODO: check if end >= start
+
+			addFieldErr("end date", "end date should be the same day or after start date")
+		}
+	}
+
+	if validationErr == nil {
+		return nil
+	}
+
+	return validationErr
+}
