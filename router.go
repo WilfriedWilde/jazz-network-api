@@ -10,8 +10,10 @@ import (
 )
 
 type handlers struct {
-	organizer *httpapi.OrganizerHandler
 	session   *httpapi.SessionHandler
+	organizer *httpapi.OrganizerHandler
+	tour      *httpapi.TourHandler
+	tourStop  *httpapi.TourStopHandler
 }
 
 func newRouter(db *sql.DB) http.Handler {
@@ -31,24 +33,34 @@ func newRouter(db *sql.DB) http.Handler {
 	mux.Handle("DELETE /api/organizers/{id}", requireAuth(http.HandlerFunc(handlers.organizer.Delete)))
 	mux.Handle("PATCH /api/organizers/{id}", requireAuth(http.HandlerFunc(handlers.organizer.Update)))
 
+	mux.Handler("POST /api/tours", requireAuth(http.HandlerFunc(handlers.tour.Create)))
+
 	return mux
 }
 
 func getHandlers(db *sql.DB) handlers {
-	organizerRepository := repository.NewOrganizerRepository(db)
-	organizerService := service.NewOrganizerService(organizerRepository)
-
 	sessionRepository := repository.NewSessionRepository(db)
 	sessionService := service.NewSessionService(sessionRepository)
 
 	userRepository := repository.NewUserRepository(db)
 	userService := service.NewUserService(userRepository)
 
+	organizerRepository := repository.NewOrganizerRepository(db)
+	organizerService := service.NewOrganizerService(organizerRepository)
+
+	tourRepository := repository.NewTourRepository(db)
+	tourService := service.NewTourService(tourRepository)
+
+	tourStopRepository := repository.NewTourStopRepository(db)
+	tourStopService := service.NewTourStopService(tourStopRepository)
+
 	return handlers{
-		organizer: &httpapi.OrganizerHandler{Service: organizerService},
 		session: &httpapi.SessionHandler{
 			SessionService: sessionService,
 			UserService:    userService,
 		},
+		organizer: &httpapi.OrganizerHandler{Service: organizerService},
+		tour:      &httpapi.TourHandler{Service: tourService},
+		tourStop:  &httpapi.TourStopHandler{Service: tourStopService},
 	}
 }
