@@ -59,3 +59,45 @@ func (s *TourService) Create(ctx context.Context, input model.TourInput) (model.
 
 	return tour, nil
 }
+
+func (s *TourService) ReadAll(ctx context.Context) ([]model.Tour, error) {
+	user, ok := m.UserFromContext(ctx)
+	if !ok {
+		return nil, fmt.Errorf("get user from context")
+	}
+
+	tours, err := s.repository.ReadAll(ctx, s.repository.DB, user.ID)
+	if err != nil {
+		return nil, convertToServiceError("read all", "tours", err)
+	}
+
+	tourStops, err := s.repository.ReadAllTourStopsByUserID(ctx, s.repository.DB, user.ID)
+	if err != nil {
+		return nil, convertToServiceError("read all", "tour_stops by user ID", err)
+	}
+
+	byTourID := make(map[int64][]model.TourStop, len(tours))
+	for _, s := range tourStops {
+		byTourID[s.TourID] = append(byTourID[s.TourID], s)
+	}
+
+	for _, t := range tours {
+		t.Stops = byTourID[t.ID]
+	}
+
+	return tours, nil
+}
+
+func (s *TourService) Read(ctx context.Context, tourID int64) (model.Tour, error) {
+	tour, err := s.repository.Read(ctx, s.repository.DB, tourID)
+	if err != nil {
+		return model.Tour{}, convertToServiceError("read", "tour", err)
+	}
+
+	tour.Stops, err = s.repository.ReadTourStopsByTourID(ctx, s.repository.DB, tourID)
+	if err != nil {
+		return model.Tour{}, convertToServiceError("read", "tour_stops by tourID", err)
+	}
+
+	return tour, nil
+}
