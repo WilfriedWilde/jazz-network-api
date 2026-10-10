@@ -14,8 +14,7 @@ CREATE TABLE IF NOT EXISTS organizers (
     notes TEXT,
     latitude REAL NOT NULL CHECK (latitude >= -90 AND latitude <= 90),
     longitude REAL NOT NULL CHECK (longitude >= -180 AND longitude <= 180),
-    public_visibility BOOLEAN NOT NULL DEFAULT FALSE,
-    UNIQUE(name, city)
+    public_visibility BOOLEAN NOT NULL DEFAULT FALSE
 );
 
 CREATE TABLE IF NOT EXISTS users (
@@ -55,15 +54,16 @@ CREATE TABLE IF NOT EXISTS user_notes (
 CREATE TABLE IF NOT EXISTS tours (
     id INTEGER PRIMARY KEY,
     user_id INTEGER NOT NULL REFERENCES users(id) ON DELETE CASCADE,
-    name TEXT NOT NULL CHECK (length(trim(name)) > 0),
-    start TEXT NOT NULL CHECK (length(trim(start)) > 0),
-    end TEXT NOT NULL CHECK (length(trim(end)) > 0)
+    name TEXT NOT NULL COLLATE NOCASE CHECK (length(trim(name)) > 0),
+    start_date TEXT NOT NULL CHECK (length(trim(start_date)) > 0),
+    end_date TEXT NOT NULL CHECK (length(trim(end_date)) > 0),
+    UNIQUE(name, user_id)
 );
 
 CREATE TABLE IF NOT EXISTS tour_stops (
     id INTEGER PRIMARY KEY,
     tour_id INTEGER NOT NULL REFERENCES tours(id) ON DELETE CASCADE,
-    organizer_id INTEGER REFERENCES organizers(id) DEFAULT SET NULL,
+    organizer_id INTEGER REFERENCES organizers(id),
     type TEXT NOT NULL DEFAULT 'free_day' CHECK (type IN ('gig', 'free_day', 'travel_day')),
     stop_order INTEGER NOT NULL,
     notes TEXT,

@@ -19,7 +19,7 @@ request:
     - name: baseURL
       value: http://localhost:8080/api
     - name: organizerID
-      value: "130"
+      value: "224"
 bundled: false
 extensions:
   bruno:

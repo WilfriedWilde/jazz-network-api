@@ -22,8 +22,6 @@ http:
         "emails": ["info@lastrada-marciac.fr"],
         "phone_numbers": ["+33964473229"],
         "contact_persons": ["Jean-Louis Guilhaumon"],
-        "schedule": "Fri, Sat, Sun",
-        "notes": "",
         "latitude": 43.52587561775889,
         "longitude": 0.16279435767019648,
         "public_visibility": true

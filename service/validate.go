@@ -5,6 +5,7 @@ import (
 	"jazz-network-api/validation"
 	"net/http"
 	"strings"
+	"time"
 	"unicode"
 )
 
@@ -231,6 +232,62 @@ func validateOrganizerUpdate(input model.OrganizerUpdate) error {
 	if input.Longitude != nil {
 		if *input.Longitude < -180. || *input.Longitude > 180. {
 			addFieldErr("longitude", "should be in range [-180, 180]")
+		}
+	}
+
+	if validationErr == nil {
+		return nil
+	}
+
+	return validationErr
+}
+
+func validateTourInput(input model.TourInput) error {
+	var validationErr *model.ValidationError
+
+	addFieldErr := func(field, message string) {
+		if validationErr == nil {
+			validationErr = &model.ValidationError{
+				Status: http.StatusBadRequest,
+				Code:   "validation_error",
+			}
+		}
+
+		validationErr.Fields = append(validationErr.Fields, model.FieldError{
+			Field:   field,
+			Message: message,
+		})
+	}
+
+	// name required
+	input.Name = strings.TrimSpace(input.Name)
+	if input.Name == "" {
+		addFieldErr("name", "required")
+	}
+
+	// start required
+	input.Start = strings.TrimSpace(input.Start)
+	if input.Start == "" {
+		addFieldErr("start", "required")
+	} else if ok, msg := validation.IsValidDate(input.Start); !ok {
+		addFieldErr("start date", msg)
+	}
+
+	// end required
+	input.End = strings.TrimSpace(input.End)
+	if input.End == "" {
+		addFieldErr("end", "required")
+	} else if okStart, _ := validation.IsValidDate(input.Start); okStart {
+		if okEnd, msg := validation.IsValidDate(input.End); !okEnd {
+			addFieldErr("end date", msg)
+		} else {
+			// check if end >= start
+			startDate, _ := time.Parse(time.DateOnly, input.Start)
+			endDate, _ := time.Parse(time.DateOnly, input.End)
+
+			if endDate.Before(startDate) {
+				addFieldErr("end date", "should be on the same day or after start date")
+			}
 		}
 	}
 
