@@ -75,6 +75,12 @@ CREATE TABLE IF NOT EXISTS tour_stops (
     UNIQUE (tour_id, stop_order)
 );
 
+CREATE TABLE IF NOT EXISTS contact_tour_stops {
+    contact_id INTEGER NOT NULL REFERENCES contacts(id) ON DELETE CASCADE,
+    tour_stop_id INTEGER NOT NULL REFERENCES tour_stops(id) ON DELETE CASCADE,
+    PRIMARY KEY (contact_id, tour_stop_id)
+};
+
 CREATE TABLE IF NOT EXISTS tour_stop_finances (
     id INTEGER PRIMARY KEY,
     tour_stop_id INTEGER NOT NULL REFERENCES tour_stops(id) ON DELETE CASCADE,
