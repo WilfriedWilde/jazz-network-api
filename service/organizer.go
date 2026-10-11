@@ -6,6 +6,7 @@ import (
 	m "jazz-network-api/middleware"
 	"jazz-network-api/model"
 	"jazz-network-api/repository"
+	"jazz-network-api/validation"
 )
 
 type OrganizerService struct {
@@ -49,7 +50,7 @@ func (s *OrganizerService) ReadAll(ctx context.Context) ([]model.Organizer, erro
 }
 
 func (s *OrganizerService) Create(ctx context.Context, input model.OrganizerInput) (model.Organizer, error) {
-	if err := validateOrganizerInput(input); err != nil {
+	if err := validation.ValidateOrganizerInput(input); err != nil {
 		return model.Organizer{}, err
 	}
 
@@ -121,7 +122,7 @@ func (s *OrganizerService) Delete(ctx context.Context, organizerID int64, force 
 }
 
 func (s *OrganizerService) Update(ctx context.Context, id int64, update model.OrganizerUpdate) (model.Organizer, error) {
-	if err := validateOrganizerUpdate(update); err != nil {
+	if err := validation.ValidateOrganizerUpdate(update); err != nil {
 		return model.Organizer{}, err
 	}
 

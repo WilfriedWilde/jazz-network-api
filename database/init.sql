@@ -68,11 +68,10 @@ CREATE TABLE IF NOT EXISTS tour_stops (
     date TEXT NOT NULL,
     country TEXT,
     city TEXT,
-    stop_order INTEGER NOT NULL,
     notes TEXT,
     CONSTRAINT check_location CHECK (type IN ('travel_day', 'unplanned') OR (country IS NOT NULL AND city IS NOT NULL)),
     CONSTRAINT check_organizer CHECK ((type = 'gig') = (organizer_id IS NOT NULL)),
-    UNIQUE (tour_id, stop_order)
+    UNIQUE (tour_id, date)
 );
 
 CREATE TABLE IF NOT EXISTS contact_tour_stops (

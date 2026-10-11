@@ -14,6 +14,12 @@ type TourInput struct {
 	End   string `json:"end"`
 }
 
+type TourUpdate struct {
+	Name  *string `json:"name"`
+	Start *string `json:"start"`
+	End   *string `json:"end"`
+}
+
 type TourCreate struct {
 	UserID int64
 	Name   string

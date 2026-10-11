@@ -5,6 +5,7 @@ import (
 	"fmt"
 	"jazz-network-api/model"
 	"jazz-network-api/repository"
+	"jazz-network-api/validation"
 
 	"golang.org/x/crypto/bcrypt"
 )
@@ -39,7 +40,7 @@ func (s *UserService) Create(ctx context.Context, input model.UserInput) (model.
 		return model.User{}, convertToServiceError("read by email", "user", ErrEmailTaken)
 	}
 
-	if err := validatePassword(input.Password); err != nil {
+	if err := validation.ValidatePassword(input.Password); err != nil {
 		return model.User{}, convertToServiceError("validate", "password", err)
 	}
 

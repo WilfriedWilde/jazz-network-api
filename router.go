@@ -36,6 +36,7 @@ func newRouter(db *sql.DB) http.Handler {
 	mux.Handle("POST /api/tours", requireAuth(http.HandlerFunc(handlers.tour.Create)))
 	mux.Handle("GET /api/tours", requireAuth(http.HandlerFunc(handlers.tour.ReadAll)))
 	mux.Handle("GET /api/tours/{id}", requireAuth(http.HandlerFunc(handlers.tour.Read)))
+	mux.Handle("PATCH /api/tours/{id}", requireAuth(http.HandlerFunc(handlers.tour.Update)))
 
 	return mux
 }
