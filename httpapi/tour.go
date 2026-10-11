@@ -51,3 +51,25 @@ func (h *TourHandler) Read(w http.ResponseWriter, r *http.Request) {
 
 	writeJSON(w, http.StatusOK, tour)
 }
+
+func (h *TourHandler) Update(w http.ResponseWriter, r *http.Request) {
+	tourID, err := parsePathID(r.PathValue("id"))
+	if err != nil {
+		writeError(w, err)
+		return
+	}
+
+	update, err := decodeJSON[model.TourUpdate](w, r)
+	if err != nil {
+		writeError(w, err)
+		return
+	}
+
+	tour, err := h.Service.Update(r.Context(), tourID, update)
+	if err != nil {
+		writeError(w, err)
+		return
+	}
+
+	writeJSON(w, http.StatusOK, tour)
+}

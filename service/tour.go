@@ -6,6 +6,7 @@ import (
 	m "jazz-network-api/middleware"
 	"jazz-network-api/model"
 	"jazz-network-api/repository"
+	"jazz-network-api/validation"
 )
 
 type TourService struct {
@@ -17,7 +18,7 @@ func NewTourService(r *repository.TourRepository) *TourService {
 }
 
 func (s *TourService) Create(ctx context.Context, input model.TourInput) (model.Tour, error) {
-	if err := validateTourInput(input); err != nil {
+	if err := validation.ValidateTourInput(input); err != nil {
 		return model.Tour{}, err
 	}
 
@@ -104,4 +105,38 @@ func (s *TourService) Read(ctx context.Context, tourID int64) (model.Tour, error
 	}
 
 	return tour, nil
+}
+
+func (s *TourService) Update(ctx context.Context, tourID int64, update model.TourUpdate) (model.Tour, error) {
+	if err := validation.ValidateTourUpdate(update); err != nil {
+		return model.Tour{}, err
+	}
+
+	tx, err := s.repository.DB.BeginTx(ctx, nil)
+	if err != nil {
+		return model.Tour{}, fmt.Errorf("begin transaction: %w", err)
+	}
+	defer func() error {
+		return tx.Rollback()
+	}()
+
+	exists, err := s.repository.Exists(ctx, tx, tourID)
+	if err != nil {
+		return model.Tour{}, convertToServiceError("check existence", "tour", err)
+	}
+
+	if !exists {
+		return model.Tour{}, ErrNotFound
+	}
+
+	tour, err := s.repository.Update(ctx, s.repository.DB, tourID, update)
+	if err != nil {
+		return model.Tour{}, convertToServiceError("update", "tour", err)
+	}
+
+	if err := tx.Commit(); err != nil {
+		return model.Tour{}, fmt.Errorf("commit transaction")
+	}
+
+	return model.Tour{}, nil
 }
