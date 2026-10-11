@@ -13,9 +13,9 @@ http:
     type: json
     data: |-
       {
-        "name": "Autumn Tour 2027",
-        "start": "2027-10-13",
-        "end": "2027-10-18"
+        "name": "Spring Tour 2027",
+        "start": "2027-04-02",
+        "end": "2027-04-15"
       }
   auth: inherit
 

@@ -18,8 +18,8 @@ const (
 	`
 
 	createToursTourStopsQuery = `
-		INSERT INTO tour_stops (tour_id, type, date, stop_order, notes)
-		VALUES(?, ?, ?, ?, ?)
+		INSERT INTO tour_stops (tour_id, type, date, stop_order)
+		VALUES(?, ?, ?, ?)
 		RETURNING *
 	`
 
@@ -95,7 +95,7 @@ func (r *TourRepository) CreateTourStops(ctx context.Context, tx *sql.Tx, numTou
 			return nil, fmt.Errorf("get stop date: %w", err)
 		}
 
-		if err := stmt.QueryRowContext(ctx, ts.TourID, ts.Type, date, i, ts.Notes).Scan(
+		if err := stmt.QueryRowContext(ctx, ts.TourID, ts.Type, date, i).Scan(
 			&s.ID, &s.TourID, &s.OrganizerID,
 			&s.Type, &s.Date, &s.Country,
 			&s.City, &s.StopOrder, &s.Notes,

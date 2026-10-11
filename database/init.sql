@@ -64,22 +64,22 @@ CREATE TABLE IF NOT EXISTS tour_stops (
     id INTEGER PRIMARY KEY,
     tour_id INTEGER NOT NULL REFERENCES tours(id) ON DELETE CASCADE,
     organizer_id INTEGER REFERENCES organizers(id),
-    type TEXT NOT NULL DEFAULT 'free_day' CHECK (type IN ('gig', 'free_day', 'travel_day')),
+    type TEXT NOT NULL DEFAULT 'unplanned' CHECK (type IN ('gig', 'travel_day', 'free_day', 'unplanned')),
     date TEXT NOT NULL,
     country TEXT,
     city TEXT,
     stop_order INTEGER NOT NULL,
     notes TEXT,
-    CONSTRAINT check_location CHECK (type = 'travel_day' OR (country IS NOT NULL AND city IS NOT NULL)),
+    CONSTRAINT check_location CHECK (type IN ('travel_day', 'unplanned') OR (country IS NOT NULL AND city IS NOT NULL)),
     CONSTRAINT check_organizer CHECK ((type = 'gig') = (organizer_id IS NOT NULL)),
     UNIQUE (tour_id, stop_order)
 );
 
-CREATE TABLE IF NOT EXISTS contact_tour_stops {
+CREATE TABLE IF NOT EXISTS contact_tour_stops (
     contact_id INTEGER NOT NULL REFERENCES contacts(id) ON DELETE CASCADE,
     tour_stop_id INTEGER NOT NULL REFERENCES tour_stops(id) ON DELETE CASCADE,
     PRIMARY KEY (contact_id, tour_stop_id)
-};
+);
 
 CREATE TABLE IF NOT EXISTS tour_stop_finances (
     id INTEGER PRIMARY KEY,
