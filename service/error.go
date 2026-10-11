@@ -3,9 +3,7 @@ package service
 import (
 	"errors"
 	"fmt"
-	"jazz-network-api/model"
 	"jazz-network-api/repository"
-	"net/http"
 )
 
 var (
@@ -16,16 +14,6 @@ var (
 	ErrInvalidCredentials = errors.New("service: invalid email or password")
 	ErrOrganizerConflict  = errors.New("service: organizer referenced by one or more tour_stops")
 	ErrNothingToUpdate    = errors.New("service: nothing to update")
-	ErrDateOrder          = &model.ValidationError{
-		Status: http.StatusBadRequest,
-		Code:   "validation_error",
-		Fields: []model.FieldError{
-			model.FieldError{
-				Field:   "end date",
-				Message: "should be on the same day or after start date",
-			},
-		},
-	}
 )
 
 func convertToServiceError(operation, resource string, err error) error {

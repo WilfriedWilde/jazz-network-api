@@ -129,14 +129,50 @@ func (s *TourService) Update(ctx context.Context, tourID int64, update model.Tou
 		return model.Tour{}, ErrNotFound
 	}
 
-	tour, err := s.repository.Update(ctx, s.repository.DB, tourID, update)
+	// if updating time range, add/remove corresponding tour_stops
+	if update.Start != nil && update.End != nil {
+		// delete stops outside of new range
+		if err := s.repository.DeleteOutOfRangeTourStops(ctx, tx, tourID, update); err != nil {
+			return model.Tour{}, convertToServiceError("delete", "out of range tour_stops", err)
+		}
+
+		// get missing dates and insert them
+		stops, err := s.repository.ReadTourStopsByTourID(ctx, tx, tourID)
+		if err != nil {
+			return model.Tour{}, convertToServiceError("read", "tour_stops by tour ID", err)
+		}
+
+		existingDates := make([]string, len(stops))
+		for i, s := range stops {
+			existingDates[i] = s.Date
+		}
+
+		missingDates, err := getMissingDates(existingDates, *update.Start, *update.End)
+		if err != nil {
+			return model.Tour{}, fmt.Errorf("get missing dates: %w")
+		}
+
+		if len(missingDates) > 0 {
+			if err := s.repository.CreateMissingTourStops(ctx, tx, tourID, missingDates); err != nil {
+				return model.Tour{}, convertToServiceError("create", "missing tour_stops", err)
+			}
+		}
+	}
+
+	// update tour
+	tour, err := s.repository.Update(ctx, tx, tourID, update)
 	if err != nil {
 		return model.Tour{}, convertToServiceError("update", "tour", err)
+	}
+
+	tour.Stops, err = s.repository.ReadTourStopsByTourID(ctx, tx, tourID)
+	if err != nil {
+		return model.Tour{}, convertToServiceError("read", "tour_stops by tourID", err)
 	}
 
 	if err := tx.Commit(); err != nil {
 		return model.Tour{}, fmt.Errorf("commit transaction")
 	}
 
-	return model.Tour{}, nil
+	return tour, nil
 }

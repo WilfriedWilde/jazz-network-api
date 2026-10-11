@@ -8,7 +8,6 @@ type TourStop struct {
 	Date        string  `json:"date"`
 	Country     *string `json:"country"`
 	City        *string `json:"city"`
-	StopOrder   int     `json:"stop_order"`
 	Notes       *string `json:"notes"`
 }
 
@@ -19,6 +18,5 @@ type TourStopCreate struct {
 	Date        string
 	Country     string
 	City        string
-	StopOrder   int
 	Notes       string
 }
