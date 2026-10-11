@@ -56,6 +56,11 @@ const (
 		WHERE id IN (%s)
 	`
 
+	deleteOrganizerContactTourStopsQuery = `
+		DELETE FROM contact_tour_stops
+		WHERE tour_stop_id IN (%s)
+	`
+
 	deleteOrganizerTourStopFinancesQuery = `
 		DELETE FROM tour_stop_finances
 		WHERE tour_stop_id IN (%s)
@@ -313,6 +318,16 @@ func (r *OrganizerRepository) ResetOrganizerTourStops(ctx context.Context, db DB
 
 	if _, err := db.ExecContext(ctx, query, args...); err != nil {
 		return fmt.Errorf("reset organizer tour_stops: %w", err)
+	}
+
+	return nil
+}
+
+func (r *OrganizerRepository) DeleteOrganizerContactTourStops(ctx context.Context, db DBTX, tourStopIDs []int64) error {
+	query, args := buildIDQueryArguments(deleteOrganizerContactTourStopsQuery, tourStopIDs)
+
+	if _, err := db.ExecContext(ctx, query, args...); err != nil {
+		return fmt.Errorf("delete tour_stop_finances (organizer): %w", err)
 	}
 
 	return nil
