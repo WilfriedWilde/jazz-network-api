@@ -81,12 +81,12 @@ func (s *TourService) ReadAll(ctx context.Context) ([]model.Tour, error) {
 	}
 
 	byTourID := make(map[int64][]model.TourStop, len(tours))
-	for _, s := range tourStops {
-		byTourID[s.TourID] = append(byTourID[s.TourID], s)
+	for _, stop := range tourStops {
+		byTourID[stop.TourID] = append(byTourID[stop.TourID], stop)
 	}
 
-	for _, t := range tours {
-		t.Stops = byTourID[t.ID]
+	for i := range tours {
+		tours[i].Stops = byTourID[tours[i].ID]
 	}
 
 	return tours, nil
