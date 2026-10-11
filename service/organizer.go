@@ -90,10 +90,14 @@ func (s *OrganizerService) Delete(ctx context.Context, organizerID int64, force 
 	if len(tourStopIDs) > 0 {
 		// on delete force:
 		// reset referencing tour_stops to organizer_id = NULL and type = free_day
-		// delete tour_stop referencers: tour_stop_finances, travels and accommodations
+		// delete tour_stop referencers: contact_tour_stops, tour_stop_finances, travels and accommodations
 		if force {
 			if err := s.repository.ResetOrganizerTourStops(ctx, tx, tourStopIDs); err != nil {
 				return convertToServiceError("update", "tour_stops (organizer)", err)
+			}
+
+			if err := s.repository.DeleteOrganizerContactTourStops(ctx, tx, tourStopIDs); err != nil {
+				return convertToServiceError("delete", "tour_stop_finances by tour_stops IDs (organizer)", err)
 			}
 
 			if err := s.repository.DeleteOrganizerTourStopFinances(ctx, tx, tourStopIDs); err != nil {
