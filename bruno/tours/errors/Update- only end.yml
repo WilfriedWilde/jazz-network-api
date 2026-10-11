@@ -1,0 +1,26 @@
+info:
+  name: "Update: only end"
+  type: http
+  seq: 6
+
+http:
+  method: PATCH
+  url: "{{baseURL}}/tours/1"
+  headers:
+    - name: Content-Type
+      value: application/json
+  body:
+    type: json
+    data: |-
+      {
+        "name": "New tour name",
+        "end": "2027-10-20"
+      }
+  auth: inherit
+
+settings:
+  encodeUrl: true
+  timeout: 0
+  followRedirects: true
+  maxRedirects: 5
+  forwardAuthorizationHeader: false

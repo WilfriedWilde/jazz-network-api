@@ -80,7 +80,9 @@ func ValidateTourUpdate(update model.TourUpdate) error {
 	// name nonempty
 	if update.Name != nil {
 		*update.Name = strings.TrimSpace(*update.Name)
-		addFieldErr("name", "nonempty")
+		if *update.Name == "" {
+			addFieldErr("name", "nonempty")
+		}
 	}
 
 	// start valid date
@@ -107,7 +109,7 @@ func ValidateTourUpdate(update model.TourUpdate) error {
 
 	if update.Start != nil && update.End != nil {
 		// check if end >= start
-		if IsEndAfterStart(*update.Start, *update.End) {
+		if !IsEndAfterStart(*update.Start, *update.End) {
 			addFieldErr("end date", "should be on the same day or after start date")
 		}
 	}

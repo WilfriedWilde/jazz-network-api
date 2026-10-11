@@ -20,7 +20,7 @@ const (
 
 	createToursTourStopsQuery = `
 		INSERT INTO tour_stops (tour_id, type, date)
-		VALUES(?, ?, ?, ?)
+		VALUES(?, ?, ?)
 		RETURNING *
 	`
 

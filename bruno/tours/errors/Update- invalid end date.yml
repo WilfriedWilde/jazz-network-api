@@ -1,0 +1,27 @@
+info:
+  name: "Update: invalid end date"
+  type: http
+  seq: 4
+
+http:
+  method: PATCH
+  url: "{{baseURL}}/tours/1"
+  headers:
+    - name: Content-Type
+      value: application/json
+  body:
+    type: json
+    data: |-
+      {
+        "name": "New tour name",
+        "start": "2027-10-20",
+        "end": "2027-10-01"
+      }
+  auth: inherit
+
+settings:
+  encodeUrl: true
+  timeout: 0
+  followRedirects: true
+  maxRedirects: 5
+  forwardAuthorizationHeader: false
