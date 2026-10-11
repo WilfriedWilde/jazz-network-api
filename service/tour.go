@@ -50,7 +50,8 @@ func (s *TourService) Create(ctx context.Context, input model.TourInput) (model.
 
 	tour.Stops, err = s.repository.CreateTourStops(ctx, tx, numTourStops, model.TourStopCreate{
 		TourID: tour.ID,
-		Type:   "free_day",
+		Type:   "unplanned",
+		Date:   tour.Start,
 	})
 	if err != nil {
 		return model.Tour{}, convertToServiceError("create", "tour's tour_stops", err)
@@ -80,12 +81,12 @@ func (s *TourService) ReadAll(ctx context.Context) ([]model.Tour, error) {
 	}
 
 	byTourID := make(map[int64][]model.TourStop, len(tours))
-	for _, s := range tourStops {
-		byTourID[s.TourID] = append(byTourID[s.TourID], s)
+	for _, stop := range tourStops {
+		byTourID[stop.TourID] = append(byTourID[stop.TourID], stop)
 	}
 
-	for _, t := range tours {
-		t.Stops = byTourID[t.ID]
+	for i := range tours {
+		tours[i].Stops = byTourID[tours[i].ID]
 	}
 
 	return tours, nil

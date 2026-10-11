@@ -18,7 +18,7 @@ const (
 	`
 
 	createToursTourStopsQuery = `
-		INSERT INTO tour_stops (tour_id, type, stop_order, notes)
+		INSERT INTO tour_stops (tour_id, type, date, stop_order)
 		VALUES(?, ?, ?, ?)
 		RETURNING *
 	`
@@ -31,7 +31,7 @@ const (
 	`
 
 	readAllTourStopsByUserIDQuery = `
-		SELECT ts.id, ts.tour_id, ts.organizer_id, ts.type, ts.stop_order, ts.notes
+		SELECT ts.id, ts.tour_id, ts.organizer_id, ts.type, ts.date, ts.country, ts.city, ts.stop_order, ts.notes
 		FROM tour_stops AS ts
 		JOIN tours AS t
 		ON t.id = ts.tour_id
@@ -78,7 +78,7 @@ func (r *TourRepository) Create(ctx context.Context, db DBTX, t model.TourCreate
 	return tour, nil
 }
 
-func (r *TourRepository) CreateTourStops(ctx context.Context, tx *sql.Tx, numTourStops int, t model.TourStopCreate) ([]model.TourStop, error) {
+func (r *TourRepository) CreateTourStops(ctx context.Context, tx *sql.Tx, numTourStops int, ts model.TourStopCreate) ([]model.TourStop, error) {
 	tourStops := make([]model.TourStop, numTourStops)
 
 	stmt, err := tx.PrepareContext(ctx, createToursTourStopsQuery)
@@ -88,16 +88,22 @@ func (r *TourRepository) CreateTourStops(ctx context.Context, tx *sql.Tx, numTou
 	defer stmt.Close()
 
 	for i := range numTourStops {
-		var stop model.TourStop
+		var s model.TourStop
 
-		if err := stmt.QueryRowContext(ctx, t.TourID, t.Type, i, t.Notes).Scan(
-			&stop.ID, &stop.TourID, &stop.OrganizerID,
-			&stop.Type, &stop.StopOrder, &stop.Notes,
+		date, err := getStopDate(ts.Date, i)
+		if err != nil {
+			return nil, fmt.Errorf("get stop date: %w", err)
+		}
+
+		if err := stmt.QueryRowContext(ctx, ts.TourID, ts.Type, date, i).Scan(
+			&s.ID, &s.TourID, &s.OrganizerID,
+			&s.Type, &s.Date, &s.Country,
+			&s.City, &s.StopOrder, &s.Notes,
 		); err != nil {
 			return nil, fmt.Errorf("scan tour_stop: %w", err)
 		}
 
-		tourStops[i] = stop
+		tourStops[i] = s
 	}
 
 	return tourStops, nil
@@ -144,7 +150,8 @@ func (r *TourRepository) ReadAllTourStopsByUserID(ctx context.Context, db DBTX, 
 
 		if err := rows.Scan(
 			&s.ID, &s.TourID, &s.OrganizerID,
-			&s.Type, &s.StopOrder, &s.Notes,
+			&s.Type, &s.Date, &s.Country,
+			&s.City, &s.StopOrder, &s.Notes,
 		); err != nil {
 			return nil, fmt.Errorf("scan tour_stop: %w", err)
 		}
@@ -188,7 +195,8 @@ func (r *TourRepository) ReadTourStopsByTourID(ctx context.Context, db DBTX, tou
 
 		if err := rows.Scan(
 			&s.ID, &s.TourID, &s.OrganizerID,
-			&s.Type, &s.StopOrder, &s.Notes,
+			&s.Type, &s.Date, &s.Country,
+			&s.City, &s.StopOrder, &s.Notes,
 		); err != nil {
 			return nil, fmt.Errorf("scan tour_stop: %w", err)
 		}

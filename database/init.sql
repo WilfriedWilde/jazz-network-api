@@ -32,7 +32,7 @@ CREATE TABLE IF NOT EXISTS sessions (
     expires_at TEXT NOT NULL
 );
 
-CREATE TABLE IF NOT EXISTS organizer_contacts (
+CREATE TABLE IF NOT EXISTS contacts (
     id INTEGER PRIMARY KEY,
     user_id INTEGER NOT NULL REFERENCES users(id) ON DELETE CASCADE,
     organizer_id INTEGER NOT NULL REFERENCES organizers(id) ON DELETE CASCADE,
@@ -64,22 +64,29 @@ CREATE TABLE IF NOT EXISTS tour_stops (
     id INTEGER PRIMARY KEY,
     tour_id INTEGER NOT NULL REFERENCES tours(id) ON DELETE CASCADE,
     organizer_id INTEGER REFERENCES organizers(id),
-    type TEXT NOT NULL DEFAULT 'free_day' CHECK (type IN ('gig', 'free_day', 'travel_day')),
+    type TEXT NOT NULL DEFAULT 'unplanned' CHECK (type IN ('gig', 'travel_day', 'free_day', 'unplanned')),
+    date TEXT NOT NULL,
+    country TEXT,
+    city TEXT,
     stop_order INTEGER NOT NULL,
     notes TEXT,
-    CHECK (
-      (type = 'gig' AND organizer_id IS NOT NULL)
-      OR (type != 'gig' AND organizer_id IS NULL)
-    ),
+    CONSTRAINT check_location CHECK (type IN ('travel_day', 'unplanned') OR (country IS NOT NULL AND city IS NOT NULL)),
+    CONSTRAINT check_organizer CHECK ((type = 'gig') = (organizer_id IS NOT NULL)),
     UNIQUE (tour_id, stop_order)
 );
 
+CREATE TABLE IF NOT EXISTS contact_tour_stops (
+    contact_id INTEGER NOT NULL REFERENCES contacts(id) ON DELETE CASCADE,
+    tour_stop_id INTEGER NOT NULL REFERENCES tour_stops(id) ON DELETE CASCADE,
+    PRIMARY KEY (contact_id, tour_stop_id)
+);
+
 CREATE TABLE IF NOT EXISTS tour_stop_finances (
-  id INTEGER PRIMARY KEY,
-  tour_stop_id INTEGER NOT NULL REFERENCES tour_stops(id) ON DELETE CASCADE,
-  category TEXT NOT NULL CHECK (category IN ('gig_fee', 'merch', 'food', 'transport', 'other')),
-  amount REAL NOT NULL DEFAULT 0,
-  notes TEXT
+    id INTEGER PRIMARY KEY,
+    tour_stop_id INTEGER NOT NULL REFERENCES tour_stops(id) ON DELETE CASCADE,
+    category TEXT NOT NULL CHECK (category IN ('gig_fee', 'merch', 'food', 'transport', 'other')),
+    amount REAL NOT NULL DEFAULT 0,
+    notes TEXT
 );
 
 CREATE TABLE IF NOT EXISTS travels (
