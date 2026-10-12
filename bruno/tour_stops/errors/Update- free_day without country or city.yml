@@ -14,8 +14,7 @@ http:
     data: |-
       {
         "type": "free_day",
-        "organizer_id": 25,
-        "city": "Paris"
+        "organizer_id": 25
       }
   auth: inherit
 

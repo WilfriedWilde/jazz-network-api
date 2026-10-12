@@ -15,7 +15,6 @@ var (
 	}
 )
 
-// TODO: returns wrong error when trying to update type = gig without organizer_id
 func ValidateTourStopUpdate(update model.TourStopUpdate) error {
 	var validationErr *model.ValidationError
 
@@ -33,49 +32,42 @@ func ValidateTourStopUpdate(update model.TourStopUpdate) error {
 		})
 	}
 
-	// type in ["gig", "travel_day", "free_day", "unplanned"]
+	isFreeDay := update.Type != nil && *update.Type == "free_day"
+	if isFreeDay {
+		if update.Country == nil {
+			addFieldErr("country", "required for type = 'free_day'")
+		} else {
+			*update.Country = strings.TrimSpace(*update.Country)
+			if *update.Country == "" {
+				addFieldErr("country", "nonempty")
+			}
+
+			if !isValidCountry(*update.Country) {
+				addFieldErr("country", "invalid country")
+			}
+		}
+
+		if update.City == nil {
+			addFieldErr("city", "required for type = 'free_day'")
+		} else {
+			*update.City = strings.TrimSpace(*update.City)
+			if *update.City == "" {
+				addFieldErr("city", "nonempty")
+			}
+		}
+	} else if update.Country != nil || update.City != nil {
+		addFieldErr("country and city", "only allowed together with type = 'free_day'")
+	}
+
+	isGig := update.Type != nil && *update.Type == "gig"
+	if isGig && update.OrganizerID == nil {
+		addFieldErr("organizer_id", "required for type = 'gig'")
+	}
+
 	if update.Type != nil {
 		*update.Type = strings.TrimSpace(*update.Type)
 		if _, found := tourStopTypes[*update.Type]; !found {
 			addFieldErr("type", "should be 'gig', 'travel_day', 'free_day' or 'unplanned'")
-		}
-
-		switch *update.Type {
-		case "free_day":
-			if update.Country == nil {
-				addFieldErr("country", "required for type = 'free_day'")
-			}
-
-			if update.City == nil {
-				addFieldErr("city", "required for type = 'free_day'")
-			}
-		case "gig":
-			if update.OrganizerID == nil {
-				addFieldErr("organizer_id", "required for type = 'gig'")
-			}
-
-			if update.Country != nil || update.City != nil {
-				addFieldErr("country and city", "not allowed for type != 'free_day'")
-			}
-		default:
-			if update.Country != nil || update.City != nil {
-				addFieldErr("country and city", "not allowed for type != 'free_day'")
-			}
-		}
-	}
-
-	// country in existing real country
-	if update.Country != nil {
-		if !isValidCountry(*update.Country) {
-			addFieldErr("country", "invalid country")
-		}
-	}
-
-	// city nonempty
-	if update.City != nil {
-		*update.City = strings.TrimSpace(*update.City)
-		if *update.City == "" {
-			addFieldErr("city", "nonempty")
 		}
 	}
 
