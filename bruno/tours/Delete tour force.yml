@@ -1,0 +1,20 @@
+info:
+  name: Delete tour force
+  type: http
+  seq: 8
+
+http:
+  method: DELETE
+  url: "{{baseURL}}/tours/2?force=true"
+  params:
+    - name: force
+      value: "true"
+      type: query
+  auth: inherit
+
+settings:
+  encodeUrl: true
+  timeout: 0
+  followRedirects: true
+  maxRedirects: 5
+  forwardAuthorizationHeader: false
