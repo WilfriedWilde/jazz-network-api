@@ -53,6 +53,13 @@ func writeAPIerror(w http.ResponseWriter, err error) {
 			Message: "organizer referenced by one or more tour_stops",
 		})
 
+	case errors.Is(err, service.ErrTourConflict):
+		log.Print(err)
+		writeJSON(w, http.StatusConflict, model.ErrBody{
+			Code:    "conflict",
+			Message: "tour has one or more planned tour_stops",
+		})
+
 	case errors.Is(err, service.ErrNothingToUpdate):
 		log.Print(err)
 		writeJSON(w, http.StatusBadRequest, model.ErrBody{

@@ -176,3 +176,30 @@ func (s *TourService) Update(ctx context.Context, tourID int64, update model.Tou
 
 	return tour, nil
 }
+
+func (s *TourService) Delete(ctx context.Context, tourID int64, force bool) error {
+	tx, err := s.repository.DB.BeginTx(ctx, nil)
+	if err != nil {
+		return fmt.Errorf("begin tx delete tour: %w", err)
+	}
+	defer func() error {
+		return tx.Rollback()
+	}()
+
+	// check if there is any tour's tour_stops with type != 'unplanned'
+	plannedTourStops, err := s.repository.CheckPlannedTourStopsByTourID(ctx, tx, tourID)
+	if err != nil {
+		return convertToServiceError("check", "planned tour_stops by tour ID", err)
+	}
+
+	if plannedTourStops && !force {
+		return ErrTourConflict
+	}
+
+	// delete tour
+	if err := s.repository.Delete(ctx, tx, tourID); err != nil {
+		return convertToServiceError("delete", "tour", err)
+	}
+
+	return tx.Commit()
+}

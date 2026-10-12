@@ -13,6 +13,7 @@ var (
 	ErrEmailTaken         = errors.New("service: email taken")
 	ErrInvalidCredentials = errors.New("service: invalid email or password")
 	ErrOrganizerConflict  = errors.New("service: organizer referenced by one or more tour_stops")
+	ErrTourConflict       = errors.New("service: tour has one or more planned tour_stops")
 	ErrNothingToUpdate    = errors.New("service: nothing to update")
 )
 
