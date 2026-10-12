@@ -1,0 +1,25 @@
+info:
+  name: "Update: tour_stop not found"
+  type: http
+  seq: 1
+
+http:
+  method: PATCH
+  url: "{{baseURL}}/tourstops/300"
+  headers:
+    - name: Content-Type
+      value: application/json
+  body:
+    type: json
+    data: |-
+      {
+        "type": "gig"
+      }
+  auth: inherit
+
+settings:
+  encodeUrl: true
+  timeout: 0
+  followRedirects: true
+  maxRedirects: 5
+  forwardAuthorizationHeader: false

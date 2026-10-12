@@ -1,0 +1,28 @@
+info:
+  name: "Update: travel_day with country or city copy"
+  type: http
+  seq: 6
+
+http:
+  method: PATCH
+  url: "{{baseURL}}/tourstops/3"
+  headers:
+    - name: Content-Type
+      value: application/json
+  body:
+    type: json
+    data: |-
+      {
+        "type": "travel_day",
+        "organizer_id": 25,
+        "country": "FR",
+        "city": "Paris"
+      }
+  auth: inherit
+
+settings:
+  encodeUrl: true
+  timeout: 0
+  followRedirects: true
+  maxRedirects: 5
+  forwardAuthorizationHeader: false

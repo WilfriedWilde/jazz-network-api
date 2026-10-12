@@ -15,7 +15,7 @@ var (
 	ErrOrganizerConflict           = errors.New("service: organizer referenced by one or more tour_stops")
 	ErrTourConflict                = errors.New("service: tour has one or more planned tour_stops")
 	ErrNothingToUpdate             = errors.New("service: nothing to update")
-	ErrTourStopConstraintLocation  = errors.New("service: country and city required for type in ['gig', 'free_day']")
+	ErrTourStopConstraintLocation  = errors.New("service: country and city accepted and required only for type = 'free_day'")
 	ErrTourStopConstraintOrganizer = errors.New("service: organizer_id is required for type = 'gig'")
 )
 

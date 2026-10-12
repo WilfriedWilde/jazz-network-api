@@ -3,6 +3,7 @@ package service
 import (
 	"context"
 	"fmt"
+	m "jazz-network-api/middleware"
 	"jazz-network-api/model"
 	"jazz-network-api/repository"
 	"jazz-network-api/validation"
@@ -29,24 +30,31 @@ func (s *TourStopService) Update(ctx context.Context, tourStopID int64, update m
 		return tx.Rollback()
 	}()
 
-	tourExists, err := s.repository.Exists(ctx, tx, tourStopID)
+	tourStopExists, err := s.repository.Exists(ctx, tx, tourStopID)
 	if err != nil {
 		return model.TourStop{}, convertToServiceError("check existence", "tour_stop", err)
 	}
 
-	if !tourExists {
+	if !tourStopExists {
+		fmt.Println("tour not found")
 		return model.TourStop{}, ErrNotFound
 	}
 
 	if update.OrganizerID != nil {
-		organizerExists, err := s.repository.ExistsOrganizer(ctx, tx, *update.OrganizerID)
-		if err != nil {
-			return model.TourStop{}, convertToServiceError("check existence", "tour_stop organizer", err)
+		user, ok := m.UserFromContext(ctx)
+		if !ok {
+			return model.TourStop{}, fmt.Errorf("get user from context")
 		}
 
-		if !organizerExists {
-			return model.TourStop{}, ErrNotFound
+		isAdmin := user.AccessLevel == adminAccessLevel
+
+		organizer, err := s.repository.ReadOrganizer(ctx, tx, *update.OrganizerID, user.ID, isAdmin)
+		if err != nil {
+			return model.TourStop{}, convertToServiceError("read", "tour_stop organizer", err)
 		}
+
+		*update.Country = organizer.Country
+		*update.City = organizer.City
 	}
 
 	tourStop, err := s.repository.Update(ctx, tx, tourStopID, update)

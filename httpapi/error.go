@@ -71,14 +71,14 @@ func writeAPIerror(w http.ResponseWriter, err error) {
 		log.Print(err)
 		writeJSON(w, http.StatusBadRequest, model.ErrBody{
 			Code:    "constraint_location",
-			Message: "country and city required for type in ['gig', 'free_day']",
+			Message: "country and city accepted and required only for type = 'free_day'",
 		})
 
 	case errors.Is(err, service.ErrTourStopConstraintOrganizer):
 		log.Print(err)
 		writeJSON(w, http.StatusBadRequest, model.ErrBody{
 			Code:    "constraint_organizer",
-			Message: "organizer_id is required for type = 'gig'",
+			Message: "organizer_id is required only for type = 'gig' and should not be present for the rest of types",
 		})
 
 	default:

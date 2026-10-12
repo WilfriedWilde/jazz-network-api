@@ -1,0 +1,25 @@
+info:
+  name: "Update: gig without organizer_id"
+  type: http
+  seq: 3
+
+http:
+  method: PATCH
+  url: "{{baseURL}}/tourstops/3"
+  headers:
+    - name: Content-Type
+      value: application/json
+  body:
+    type: json
+    data: |-
+      {
+        "type": "gig"
+      }
+  auth: inherit
+
+settings:
+  encodeUrl: true
+  timeout: 0
+  followRedirects: true
+  maxRedirects: 5
+  forwardAuthorizationHeader: false

@@ -35,8 +35,23 @@ func ValidateTourStopUpdate(update model.TourStopUpdate) error {
 	// type in ["gig", "travel_day", "free_day", "unplanned"]
 	if update.Type != nil {
 		*update.Type = strings.TrimSpace(*update.Type)
-		if _, found := organizerTypes[*update.Type]; !found {
+		if _, found := tourStopTypes[*update.Type]; !found {
 			addFieldErr("type", "should be 'gig', 'travel_day', 'free_day' or 'unplanned'")
+		}
+
+		switch *update.Type {
+		case "free_day":
+			if update.Country == nil {
+				addFieldErr("country", "required for type = 'free_day'")
+			}
+
+			if update.City == nil {
+				addFieldErr("city", "required for type = 'free_day'")
+			}
+		default:
+			if update.Country != nil || update.City != nil {
+				addFieldErr("country and city", "not allowed for type != 'free_day'")
+			}
 		}
 	}
 
