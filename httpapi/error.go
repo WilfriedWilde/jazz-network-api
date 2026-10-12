@@ -67,6 +67,20 @@ func writeAPIerror(w http.ResponseWriter, err error) {
 			Message: "update request body must not be empty",
 		})
 
+	case errors.Is(err, service.ErrTourStopConstraintLocation):
+		log.Print(err)
+		writeJSON(w, http.StatusBadRequest, model.ErrBody{
+			Code:    "constraint_location",
+			Message: "country and city required for type in ['gig', 'free_day']",
+		})
+
+	case errors.Is(err, service.ErrTourStopConstraintOrganizer):
+		log.Print(err)
+		writeJSON(w, http.StatusBadRequest, model.ErrBody{
+			Code:    "constraint_organizer",
+			Message: "organizer_id is required for type = 'gig'",
+		})
+
 	default:
 		log.Println(err)
 		writeJSON(w, http.StatusInternalServerError, model.ErrBody{

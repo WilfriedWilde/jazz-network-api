@@ -20,3 +20,11 @@ type TourStopCreate struct {
 	City        string
 	Notes       string
 }
+
+type TourStopUpdate struct {
+	OrganizerID *int64  `json:"organizer_id"`
+	Type        *string `json:"type"`
+	Country     *string `json:"country"`
+	City        *string `json:"city"`
+	Notes       *string `json:"notes"`
+}
