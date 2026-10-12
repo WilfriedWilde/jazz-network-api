@@ -53,8 +53,8 @@ func (s *TourStopService) Update(ctx context.Context, tourStopID int64, update m
 			return model.TourStop{}, convertToServiceError("read", "tour_stop organizer", err)
 		}
 
-		*update.Country = organizer.Country
-		*update.City = organizer.City
+		update.Country = &organizer.Country
+		update.City = &organizer.City
 	}
 
 	tourStop, err := s.repository.Update(ctx, tx, tourStopID, update)

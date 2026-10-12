@@ -13,7 +13,8 @@ http:
     type: json
     data: |-
       {
-        "type": "gig"
+        "type": "gig",
+        "organizer_id": 3
       }
   auth: inherit
 

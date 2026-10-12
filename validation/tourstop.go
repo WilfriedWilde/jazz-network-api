@@ -15,6 +15,7 @@ var (
 	}
 )
 
+// TODO: returns wrong error when trying to update type = gig without organizer_id
 func ValidateTourStopUpdate(update model.TourStopUpdate) error {
 	var validationErr *model.ValidationError
 
@@ -47,6 +48,14 @@ func ValidateTourStopUpdate(update model.TourStopUpdate) error {
 
 			if update.City == nil {
 				addFieldErr("city", "required for type = 'free_day'")
+			}
+		case "gig":
+			if update.OrganizerID == nil {
+				addFieldErr("organizer_id", "required for type = 'gig'")
+			}
+
+			if update.Country != nil || update.City != nil {
+				addFieldErr("country and city", "not allowed for type != 'free_day'")
 			}
 		default:
 			if update.Country != nil || update.City != nil {
