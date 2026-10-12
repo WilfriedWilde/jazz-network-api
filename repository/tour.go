@@ -77,6 +77,19 @@ const (
 		WHERE id = ?
 		RETURNING id, name, start_date, end_date
 	`
+
+	checkPlannedTourStopsQuery = `
+		SELECT EXISTS (
+			SELECT 1
+			FROM tour_stops
+			WHERE tour_id = ? AND type != 'unplanned'
+		)
+	`
+
+	deleteTourQuery = `
+		DELETE FROM tours
+		WHERE id = ?
+	`
 )
 
 type TourRepository struct {
@@ -303,4 +316,26 @@ func (r *TourRepository) Update(ctx context.Context, tx *sql.Tx, tourID int64, u
 	}
 
 	return tour, nil
+}
+
+func (r *TourRepository) CheckPlannedTourStopsByTourID(ctx context.Context, tx *sql.Tx, tourID int64) (bool, error) {
+	var exists bool
+
+	if err := tx.QueryRowContext(ctx, checkPlannedTourStopsQuery, tourID).Scan(&exists); err != nil {
+		return false, fmt.Errorf("check planned tour_stops by tour ID: %w", err)
+	}
+
+	return exists, nil
+}
+
+func (r *TourRepository) Delete(ctx context.Context, tx *sql.Tx, tourID int64) error {
+	if _, err := tx.ExecContext(ctx, deleteTourQuery, tourID); err != nil {
+		if errors.Is(err, sql.ErrNoRows) {
+			return ErrNotFound
+		}
+
+		return fmt.Errorf("delete tour: %w", err)
+	}
+
+	return nil
 }

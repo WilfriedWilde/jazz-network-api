@@ -52,3 +52,21 @@ func parseBool(value, key string) (bool, error) {
 		return false, fmt.Errorf("%s should be a boolean", key)
 	}
 }
+
+func parseDelete(q []string) (bool, error) {
+	if len(q) > 1 {
+		return false, fmt.Errorf("only one 'force' query parameter allowed")
+	}
+
+	var force bool
+	var err error
+
+	if len(q) > 0 {
+		force, err = parseBool(q[0], "force")
+		if err != nil {
+			return false, err
+		}
+	}
+
+	return force, nil
+}

@@ -1,0 +1,16 @@
+info:
+  name: Delete tour guarded
+  type: http
+  seq: 8
+
+http:
+  method: DELETE
+  url: "{{baseURL}}/tours/1"
+  auth: inherit
+
+settings:
+  encodeUrl: true
+  timeout: 0
+  followRedirects: true
+  maxRedirects: 5
+  forwardAuthorizationHeader: false
