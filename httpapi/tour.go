@@ -73,3 +73,29 @@ func (h *TourHandler) Update(w http.ResponseWriter, r *http.Request) {
 
 	writeJSON(w, http.StatusOK, tour)
 }
+
+func (h *TourHandler) Delete(w http.ResponseWriter, r *http.Request) {
+	query, err := parseStrictQuery(r, deleteKeysQuery)
+	if err != nil {
+		writeError(w, err)
+		return
+	}
+
+	force, err := parseDelete(query["force"])
+	if err != nil {
+		writeError(w, err)
+	}
+
+	organizerID, err := parsePathID(r.PathValue("id"))
+	if err != nil {
+		writeError(w, err)
+		return
+	}
+
+	if err := h.Service.Delete(r.Context(), organizerID, force); err != nil {
+		writeError(w, err)
+		return
+	}
+
+	w.WriteHeader(http.StatusNoContent)
+}
