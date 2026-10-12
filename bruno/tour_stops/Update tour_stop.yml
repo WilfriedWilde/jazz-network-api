@@ -1,0 +1,26 @@
+info:
+  name: Update tour_stop
+  type: http
+  seq: 1
+
+http:
+  method: PATCH
+  url: "{{baseURL}}/tourstops/2"
+  headers:
+    - name: Content-Type
+      value: application/json
+  body:
+    type: json
+    data: |-
+      {
+        "type": "gig",
+        "organizer_id": 3
+      }
+  auth: inherit
+
+settings:
+  encodeUrl: true
+  timeout: 0
+  followRedirects: true
+  maxRedirects: 5
+  forwardAuthorizationHeader: false

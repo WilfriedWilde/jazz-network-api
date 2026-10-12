@@ -1,0 +1,27 @@
+info:
+  name: "Update: gig with country or city"
+  type: http
+  seq: 4
+
+http:
+  method: PATCH
+  url: "{{baseURL}}/tourstops/3"
+  headers:
+    - name: Content-Type
+      value: application/json
+  body:
+    type: json
+    data: |-
+      {
+        "type": "gig",
+        "organizer_id": 25,
+        "city": "Paris"
+      }
+  auth: inherit
+
+settings:
+  encodeUrl: true
+  timeout: 0
+  followRedirects: true
+  maxRedirects: 5
+  forwardAuthorizationHeader: false

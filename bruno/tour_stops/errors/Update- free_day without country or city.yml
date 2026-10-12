@@ -1,0 +1,26 @@
+info:
+  name: "Update: free_day without country or city"
+  type: http
+  seq: 5
+
+http:
+  method: PATCH
+  url: "{{baseURL}}/tourstops/3"
+  headers:
+    - name: Content-Type
+      value: application/json
+  body:
+    type: json
+    data: |-
+      {
+        "type": "free_day",
+        "organizer_id": 25
+      }
+  auth: inherit
+
+settings:
+  encodeUrl: true
+  timeout: 0
+  followRedirects: true
+  maxRedirects: 5
+  forwardAuthorizationHeader: false
