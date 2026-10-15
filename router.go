@@ -26,6 +26,7 @@ func newRouter(db *sql.DB) http.Handler {
 	mux.HandleFunc("POST /api/signup", handlers.session.Signup)
 	mux.HandleFunc("POST /api/login", handlers.session.Login)
 	mux.HandleFunc("POST /api/logout", handlers.session.Logout)
+	mux.Handle("GET /api/me", requireAuth(http.HandlerFunc(handlers.session.Me)))
 
 	mux.Handle("GET /api/organizers", requireAuth(http.HandlerFunc(handlers.organizer.ReadAll)))
 	mux.Handle("GET /api/organizers/{id}", requireAuth(http.HandlerFunc(handlers.organizer.Read)))

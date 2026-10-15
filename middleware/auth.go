@@ -21,13 +21,19 @@ func AuthMiddleware(sessionRepo *repo.SessionRepository) func(http.Handler) http
 		return http.HandlerFunc(func(w http.ResponseWriter, r *http.Request) {
 			sessionUUID, err := GetSessionID(r)
 			if err != nil {
-				http.Error(w, "unauthorized", http.StatusUnauthorized)
+				writeJSON(w, http.StatusUnauthorized, model.ErrBody{
+					Code:    "unauthorized",
+					Message: "session not found",
+				})
 				return
 			}
 
 			user, err := sessionRepo.GetUserBySession(r.Context(), sessionRepo.DB, sessionUUID)
 			if err != nil {
-				http.Error(w, "unauthorized", http.StatusUnauthorized)
+				writeJSON(w, http.StatusUnauthorized, model.ErrBody{
+					Code:    "unauthorized",
+					Message: "user not found",
+				})
 				return
 			}
 

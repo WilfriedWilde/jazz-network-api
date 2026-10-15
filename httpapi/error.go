@@ -46,6 +46,27 @@ func writeAPIerror(w http.ResponseWriter, err error) {
 			Message: "entity already existing",
 		})
 
+	case errors.Is(err, service.ErrUsernameTaken):
+		log.Print(err)
+		writeJSON(w, http.StatusConflict, model.ErrBody{
+			Code:    "duplicate",
+			Message: "username already taken",
+		})
+
+	case errors.Is(err, service.ErrEmailTaken):
+		log.Print(err)
+		writeJSON(w, http.StatusConflict, model.ErrBody{
+			Code:    "duplicate",
+			Message: "email already taken",
+		})
+
+	case errors.Is(err, service.ErrInvalidCredentials):
+		log.Print(err)
+		writeJSON(w, http.StatusUnauthorized, model.ErrBody{
+			Code:    "unauthorized",
+			Message: "invalid credentials",
+		})
+
 	case errors.Is(err, service.ErrOrganizerConflict):
 		log.Print(err)
 		writeJSON(w, http.StatusConflict, model.ErrBody{
