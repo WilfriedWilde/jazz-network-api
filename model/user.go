@@ -1,11 +1,11 @@
 package model
 
 type User struct {
-	ID           int64
-	Username     string
-	Email        string
-	PasswordHash string
-	AccessLevel  int
+	ID           int64  `json:"id"`
+	Username     string `json:"username"`
+	Email        string `json:"email"`
+	PasswordHash string `json:"-"`
+	AccessLevel  int    `json:"access_level"`
 }
 
 type UserInput struct {

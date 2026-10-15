@@ -2,6 +2,7 @@ package httpapi
 
 import (
 	"errors"
+	m "jazz-network-api/middleware"
 	"jazz-network-api/model"
 	"jazz-network-api/service"
 	"jazz-network-api/validation"
@@ -53,7 +54,7 @@ func (s *SessionHandler) Signup(w http.ResponseWriter, r *http.Request) {
 		Path:     "/",
 	})
 
-	writeJSON(w, http.StatusOK, user)
+	writeJSON(w, http.StatusCreated, user)
 }
 
 func (s *SessionHandler) Login(w http.ResponseWriter, r *http.Request) {
@@ -131,4 +132,18 @@ func (s *SessionHandler) Logout(w http.ResponseWriter, r *http.Request) {
 
 	// write successful response
 	w.WriteHeader(http.StatusOK)
+}
+
+func (s *SessionHandler) Me(w http.ResponseWriter, r *http.Request) {
+	user, ok := m.UserFromContext(r.Context())
+	if !ok {
+		writeJSON(w, http.StatusUnauthorized, model.ErrBody{
+			Code:    "unauthorized",
+			Message: "session not found",
+		})
+
+		return
+	}
+
+	writeJSON(w, http.StatusOK, user)
 }
