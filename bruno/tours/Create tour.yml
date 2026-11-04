@@ -13,7 +13,8 @@ http:
     type: json
     data: |-
       {
-        "name": "Spring Tour 2027",
+        "project_name": "John Coltrane 4tet",
+        "tour_name": "Spring Tour 2027",
         "start": "2027-04-02",
         "end": "2027-04-15"
       }

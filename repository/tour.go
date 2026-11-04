@@ -13,9 +13,9 @@ import (
 
 const (
 	createTourQuery = `
-		INSERT INTO tours (user_id, name, start_date, end_date)
-		VALUES(?, ?, ?, ?)
-		RETURNING id, name, start_date, end_date
+		INSERT INTO tours (user_id, tour_name, project_name, start_date, end_date)
+		VALUES(?, ?, ?, ?, ?)
+		RETURNING id, tour_name, project_name, start_date, end_date
 	`
 
 	createToursTourStopsQuery = `
@@ -25,7 +25,7 @@ const (
 	`
 
 	readAllToursQuery = `
-		SELECT id, name, start_date, end_date
+		SELECT id, tour_name, project_name, start_date, end_date
 		FROM tours
 		WHERE user_id = ?
 		ORDER BY id ASC
@@ -40,8 +40,15 @@ const (
 		ORDER BY ts.date ASC
 	`
 
+	readContactsByUserIDQuery = `
+		SELECT id, organizer_id, method, status, last_attempted_at, notes
+		FROM contacts
+		WHERE user_id = ?
+		ORDER BY last_attempted_at ASC
+	`
+
 	readTourByIDQuery = `
-		SELECT id, name, start_date, end_date
+		SELECT id, tour_name, project_name, start_date, end_date
 		FROM tours
 		WHERE id = ?
 	`
@@ -75,7 +82,7 @@ const (
 		UPDATE tours
 		SET %s
 		WHERE id = ?
-		RETURNING id, name, start_date, end_date
+		RETURNING id, tour_name, project_name, start_date, end_date
 	`
 
 	checkPlannedTourStopsQuery = `
@@ -103,8 +110,8 @@ func NewTourRepository(db *sql.DB) *TourRepository {
 func (r *TourRepository) Create(ctx context.Context, db DBTX, t model.TourCreate) (model.Tour, error) {
 	var tour model.Tour
 
-	if err := db.QueryRowContext(ctx, createTourQuery, t.UserID, t.Name, t.Start, t.End).Scan(
-		&tour.ID, &tour.Name, &tour.Start, &tour.End,
+	if err := db.QueryRowContext(ctx, createTourQuery, t.UserID, t.TourName, t.ProjectName, t.Start, t.End).Scan(
+		&tour.ID, &tour.TourName, &tour.ProjectName, &tour.Start, &tour.End,
 	); err != nil {
 		var sqliteErr sqlite3.Error
 		if errors.As(err, &sqliteErr) && sqliteErr.ExtendedCode == sqlite3.ErrConstraintUnique {
@@ -161,7 +168,7 @@ func (r *TourRepository) ReadAll(ctx context.Context, db DBTX, userID int64) ([]
 		t := model.Tour{}
 
 		if err := rows.Scan(
-			&t.ID, &t.Name, &t.Start, &t.End,
+			&t.ID, &t.TourName, &t.ProjectName, &t.Start, &t.End,
 		); err != nil {
 			return nil, fmt.Errorf("scan tour: %w", err)
 		}
@@ -208,7 +215,7 @@ func (r *TourRepository) Read(ctx context.Context, db DBTX, tourID int64) (model
 	var tour model.Tour
 
 	if err := db.QueryRowContext(ctx, readTourByIDQuery, tourID).Scan(
-		&tour.ID, &tour.Name, &tour.Start, &tour.End,
+		&tour.ID, &tour.TourName, &tour.ProjectName, &tour.Start, &tour.End,
 	); err != nil {
 		if errors.Is(err, sql.ErrNoRows) {
 			return model.Tour{}, ErrNotFound
@@ -247,6 +254,34 @@ func (r *TourRepository) ReadTourStopsByTourID(ctx context.Context, db DBTX, tou
 	}
 
 	return stops, nil
+}
+
+func (r *TourRepository) ReadAllContactsByUserID(ctx context.Context, db DBTX, userID int64) ([]model.Contact, error) {
+	rows, err := db.QueryContext(ctx, readContactsByUserIDQuery, userID)
+	if err != nil {
+		return nil, fmt.Errorf("read contacts by user ID: %w", err)
+	}
+	defer rows.Close()
+
+	contacts := make([]model.Contact, 0)
+
+	for rows.Next() {
+		c := model.Contact{}
+
+		if err := rows.Scan(
+			&c.ID, &c.OrganizerID, &c.Method,
+			&c.Status, &c.LastAttempt, &c.Notes,
+		); err != nil {
+			return nil, fmt.Errorf("scan contact: %w", err)
+		}
+
+		contacts = append(contacts, c)
+	}
+	if err := rows.Err(); err != nil {
+		return nil, fmt.Errorf("iterate over contacts rows: %w", err)
+	}
+
+	return contacts, nil
 }
 
 func (r *TourRepository) Exists(ctx context.Context, db DBTX, id int64) (bool, error) {
@@ -289,8 +324,12 @@ func (r *TourRepository) Update(ctx context.Context, tx *sql.Tx, tourID int64, u
 		args = append(args, val)
 	}
 
-	if u.Name != nil {
-		addColumnValue("name", *u.Name)
+	if u.TourName != nil {
+		addColumnValue("tour_name", *u.TourName)
+	}
+
+	if u.ProjectName != nil {
+		addColumnValue("project_name", *u.ProjectName)
 	}
 
 	if u.Start != nil {
@@ -305,7 +344,7 @@ func (r *TourRepository) Update(ctx context.Context, tx *sql.Tx, tourID int64, u
 	query := fmt.Sprintf(updateTourQuery, strings.Join(placeholders, ", "))
 
 	if err := tx.QueryRowContext(ctx, query, append(args, tourID)...).Scan(
-		&tour.ID, &tour.Name, &tour.Start, &tour.End,
+		&tour.ID, &tour.TourName, &tour.ProjectName, &tour.Start, &tour.End,
 	); err != nil {
 		var sqliteErr sqlite3.Error
 		if errors.As(err, &sqliteErr) && sqliteErr.ExtendedCode == sqlite3.ErrConstraintUnique {

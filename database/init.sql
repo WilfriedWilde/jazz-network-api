@@ -54,10 +54,11 @@ CREATE TABLE IF NOT EXISTS user_notes (
 CREATE TABLE IF NOT EXISTS tours (
     id INTEGER PRIMARY KEY,
     user_id INTEGER NOT NULL REFERENCES users(id) ON DELETE CASCADE,
-    name TEXT NOT NULL COLLATE NOCASE CHECK (length(trim(name)) > 0),
+    tour_name TEXT NOT NULL COLLATE NOCASE CHECK (length(trim(tour_name)) > 0),
+    project_name TEXT NOT NULL COLLATE NOCASE CHECK (length(trim(project_name)) > 0),
     start_date TEXT NOT NULL CHECK (length(trim(start_date)) > 0),
     end_date TEXT NOT NULL CHECK (length(trim(end_date)) > 0),
-    UNIQUE(name, user_id)
+    UNIQUE(tour_name, project_name, user_id)
 );
 
 CREATE TABLE IF NOT EXISTS tour_stops (

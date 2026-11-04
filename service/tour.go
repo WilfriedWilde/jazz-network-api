@@ -36,10 +36,11 @@ func (s *TourService) Create(ctx context.Context, input model.TourInput) (model.
 	}
 
 	tourCreate := model.TourCreate{
-		UserID: user.ID,
-		Name:   input.Name,
-		Start:  input.Start,
-		End:    input.End,
+		UserID:      user.ID,
+		TourName:    input.TourName,
+		ProjectName: input.ProjectName,
+		Start:       input.Start,
+		End:         input.End,
 	}
 
 	tour, err := s.repository.Create(ctx, tx, tourCreate)
@@ -81,13 +82,37 @@ func (s *TourService) ReadAll(ctx context.Context) ([]model.Tour, error) {
 		return nil, convertToServiceError("read all", "tour_stops by user ID", err)
 	}
 
-	byTourID := make(map[int64][]model.TourStop, len(tours))
+	contacts, err := s.repository.ReadAllContactsByUserID(ctx, s.repository.DB, user.ID)
+	if err != nil {
+		return nil, convertToServiceError("read all", "contacts by user ID", err)
+	}
+
+	stopsByTourID := make(map[int64][]model.TourStop, len(tours))
+	contactsByOrganizerID := make(map[int64]model.Contact, 0)
+	contactsByTourID := make(map[int64][]model.Contact, 0)
+
+	for _, contact := range contacts {
+		contactsByOrganizerID[contact.OrganizerID] = contact
+	}
+
 	for _, stop := range tourStops {
-		byTourID[stop.TourID] = append(byTourID[stop.TourID], stop)
+		stopsByTourID[stop.TourID] = append(stopsByTourID[stop.TourID], stop)
+
+		if stop.Type == "gig" {
+			contactsByTourID[stop.TourID] = append(contactsByTourID[stop.TourID], contactsByOrganizerID[*stop.OrganizerID])
+		}
 	}
 
 	for i := range tours {
-		tours[i].Stops = byTourID[tours[i].ID]
+		tours[i].Stops = stopsByTourID[tours[i].ID]
+	}
+
+	for i := range tours {
+		for j := range tours[i].Stops {
+			if tours[i].Stops[j].OrganizerID != nil {
+				tours[i].Contacts = contactsByTourID[*tours[i].Stops[j].OrganizerID]
+			}
+		}
 	}
 
 	return tours, nil

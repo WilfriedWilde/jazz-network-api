@@ -1,7 +1,7 @@
 info:
   name: "Update: invalid end date"
   type: http
-  seq: 4
+  seq: 5
 
 http:
   method: PATCH
@@ -13,7 +13,7 @@ http:
     type: json
     data: |-
       {
-        "name": "New tour name",
+        "tour_name": "New tour name",
         "start": "2027-10-20",
         "end": "2027-10-01"
       }
