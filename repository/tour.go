@@ -249,6 +249,35 @@ func (r *TourRepository) ReadTourStopsByTourID(ctx context.Context, db DBTX, tou
 	return stops, nil
 }
 
+func (r *TourRepository) ReadAllContactsByUserID(ctx context.Context, db DBTX, userID int64) ([]model.Contact, error) {
+	rows, err := db.QueryContext(ctx, readConctactsByUserIDQuery, userID)
+	if err != nil {
+		return nil, fmt.Errorf("read contacts by user ID: %w", err)
+	}
+	defer rows.Close()
+
+	contacts := make([]model.Contact, 0)
+
+	for rows.Next() {
+		c := model.Contact{}
+
+		if err := rows.Scan(
+			&c.ID, &c.TourID, &c.OrganizerID,
+			&c.Type, &c.Date, &c.Country,
+			&c.City, &c.Notes,
+		); err != nil {
+			return nil, fmt.Errorf("scan contact: %w", err)
+		}
+
+		contacts = append(contacts, c)
+	}
+	if err := rows.Err(); err != nil {
+		return nil, fmt.Errorf("iterate over contacts rows: %w", err)
+	}
+
+	return contacts, nil
+}
+
 func (r *TourRepository) Exists(ctx context.Context, db DBTX, id int64) (bool, error) {
 	var exists bool
 	err := db.QueryRowContext(ctx, existTourQuery, id).Scan(&exists)
