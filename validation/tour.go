@@ -30,6 +30,12 @@ func ValidateTourInput(input model.TourInput) error {
 		addFieldErr("tour_name", "required")
 	}
 
+	// project_name required
+	input.ProjectName = strings.TrimSpace(input.ProjectName)
+	if input.ProjectName == "" {
+		addFieldErr("project_name", "required")
+	}
+
 	// start required
 	input.Start = strings.TrimSpace(input.Start)
 	if input.Start == "" {
@@ -77,11 +83,19 @@ func ValidateTourUpdate(update model.TourUpdate) error {
 		})
 	}
 
-	// name nonempty
-	if update.Name != nil {
-		*update.Name = strings.TrimSpace(*update.Name)
-		if *update.Name == "" {
-			addFieldErr("name", "nonempty")
+	// tour_name nonempty
+	if update.TourName != nil {
+		*update.TourName = strings.TrimSpace(*update.TourName)
+		if *update.TourName == "" {
+			addFieldErr("tour_name", "nonempty")
+		}
+	}
+
+	// project_name nonempty
+	if update.ProjectName != nil {
+		*update.ProjectName = strings.TrimSpace(*update.ProjectName)
+		if *update.ProjectName == "" {
+			addFieldErr("project_name", "nonempty")
 		}
 	}
 
