@@ -36,10 +36,11 @@ func (s *TourService) Create(ctx context.Context, input model.TourInput) (model.
 	}
 
 	tourCreate := model.TourCreate{
-		UserID: user.ID,
-		Name:   input.Name,
-		Start:  input.Start,
-		End:    input.End,
+		UserID:      user.ID,
+		TourName:    input.TourName,
+		ProjectName: input.ProjectName,
+		Start:       input.Start,
+		End:         input.End,
 	}
 
 	tour, err := s.repository.Create(ctx, tx, tourCreate)
