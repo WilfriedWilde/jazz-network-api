@@ -14,8 +14,8 @@ import (
 const (
 	createTourQuery = `
 		INSERT INTO tours (user_id, tour_name, project_name, start_date, end_date)
-		VALUES(?, ?, ?, ?)
-		RETURNING id, name, start_date, end_date
+		VALUES(?, ?, ?, ?, ?)
+		RETURNING id, tour_name, project_name, start_date, end_date
 	`
 
 	createToursTourStopsQuery = `

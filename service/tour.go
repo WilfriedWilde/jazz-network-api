@@ -109,7 +109,9 @@ func (s *TourService) ReadAll(ctx context.Context) ([]model.Tour, error) {
 
 	for i := range tours {
 		for j := range tours[i].Stops {
-			tours[i].Contacts = contactsByTourID[*tours[i].Stops[j].OrganizerID]
+			if tours[i].Stops[j].OrganizerID != nil {
+				tours[i].Contacts = contactsByTourID[*tours[i].Stops[j].OrganizerID]
+			}
 		}
 	}
 
