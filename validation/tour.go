@@ -24,10 +24,10 @@ func ValidateTourInput(input model.TourInput) error {
 		})
 	}
 
-	// name required
-	input.Name = strings.TrimSpace(input.Name)
-	if input.Name == "" {
-		addFieldErr("name", "required")
+	// tour_name required
+	input.TourName = strings.TrimSpace(input.TourName)
+	if input.TourName == "" {
+		addFieldErr("tour_name", "required")
 	}
 
 	// start required
