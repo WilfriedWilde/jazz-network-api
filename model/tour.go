@@ -1,11 +1,12 @@
 package model
 
 type Tour struct {
-	ID    int64      `json:"id"`
-	Name  string     `json:"name"`
-	Start string     `json:"start"`
-	End   string     `json:"end"`
-	Stops []TourStop `json:"stops"`
+	ID       int64      `json:"id"`
+	Name     string     `json:"name"`
+	Start    string     `json:"start"`
+	End      string     `json:"end"`
+	Stops    []TourStop `json:"stops"`
+	Contacts []Contact  `json:"contacts"`
 }
 
 type TourInput struct {
