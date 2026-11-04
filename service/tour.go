@@ -92,7 +92,7 @@ func (s *TourService) ReadAll(ctx context.Context) ([]model.Tour, error) {
 	contactsByTourID := make(map[int64][]model.Contact, 0)
 
 	for _, contact := range contacts {
-		contactsByOrganizerID[contact.OrganizerID] = append(contactsByOrganizerID[contact.OrganizerID], contact)
+		contactsByOrganizerID[contact.OrganizerID] = contact
 	}
 
 	for _, stop := range tourStops {

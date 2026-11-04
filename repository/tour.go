@@ -40,6 +40,13 @@ const (
 		ORDER BY ts.date ASC
 	`
 
+	readContactsByUserIDQuery = `
+		SELECT id, organizer_id, method, status, last_attempted_at, notes
+		FROM contacts
+		WHERE user_id = ?
+		ORDER BY last_attempted_at ASC
+	`
+
 	readTourByIDQuery = `
 		SELECT id, tour_name, project_name, start_date, end_date
 		FROM tours
@@ -250,7 +257,7 @@ func (r *TourRepository) ReadTourStopsByTourID(ctx context.Context, db DBTX, tou
 }
 
 func (r *TourRepository) ReadAllContactsByUserID(ctx context.Context, db DBTX, userID int64) ([]model.Contact, error) {
-	rows, err := db.QueryContext(ctx, readConctactsByUserIDQuery, userID)
+	rows, err := db.QueryContext(ctx, readContactsByUserIDQuery, userID)
 	if err != nil {
 		return nil, fmt.Errorf("read contacts by user ID: %w", err)
 	}
@@ -262,9 +269,8 @@ func (r *TourRepository) ReadAllContactsByUserID(ctx context.Context, db DBTX, u
 		c := model.Contact{}
 
 		if err := rows.Scan(
-			&c.ID, &c.TourID, &c.OrganizerID,
-			&c.Type, &c.Date, &c.Country,
-			&c.City, &c.Notes,
+			&c.ID, &c.OrganizerID, &c.Method,
+			&c.Status, &c.LastAttempt, &c.Notes,
 		); err != nil {
 			return nil, fmt.Errorf("scan contact: %w", err)
 		}
