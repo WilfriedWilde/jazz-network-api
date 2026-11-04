@@ -58,7 +58,7 @@ CREATE TABLE IF NOT EXISTS tours (
     project_name TEXT NOT NULL COLLATE NOCASE CHECK (length(trim(project_name)) > 0),
     start_date TEXT NOT NULL CHECK (length(trim(start_date)) > 0),
     end_date TEXT NOT NULL CHECK (length(trim(end_date)) > 0),
-    UNIQUE(name, user_id)
+    UNIQUE(tour_name, project_name, user_id)
 );
 
 CREATE TABLE IF NOT EXISTS tour_stops (
