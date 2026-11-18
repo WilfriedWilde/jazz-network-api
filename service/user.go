@@ -68,7 +68,7 @@ func (s *UserService) Create(ctx context.Context, input model.UserInput) (model.
 
 func (s *UserService) Authenticate(ctx context.Context, input model.UserInput) (model.User, error) {
 	user, err := s.repository.GetByEmail(ctx, s.repository.DB, input.Email)
-	if err != nil {
+	if err != nil || user == nil {
 		bcrypt.CompareHashAndPassword(dummyHash, []byte(input.Password))
 		return model.User{}, convertToServiceError("authenticate", "user", ErrInvalidCredentials)
 	}
