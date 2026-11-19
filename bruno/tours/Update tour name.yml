@@ -13,7 +13,7 @@ http:
     type: json
     data: |-
       {
-        "name": "New tour name"
+        "tour_name": "New tour name"
       }
   auth: inherit
 

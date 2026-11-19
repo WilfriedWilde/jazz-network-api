@@ -76,63 +76,38 @@ func (s *TourService) ReadAll(ctx context.Context) ([]model.Tour, error) {
 	if err != nil {
 		return nil, convertToServiceError("read all", "tours", err)
 	}
-
-	tourStops, err := s.repository.ReadAllTourStopsByUserID(ctx, s.repository.DB, user.ID)
-	if err != nil {
-		return nil, convertToServiceError("read all", "tour_stops by user ID", err)
-	}
-
-	contacts, err := s.repository.ReadAllContactsByUserID(ctx, s.repository.DB, user.ID)
-	if err != nil {
-		return nil, convertToServiceError("read all", "contacts by user ID", err)
-	}
-
-	stopsByTourID := make(map[int64][]model.TourStop, len(tours))
-	contactsByOrganizerID := make(map[int64]model.Contact, 0)
-	contactsByTourID := make(map[int64][]model.Contact, 0)
-
-	for _, contact := range contacts {
-		contactsByOrganizerID[contact.OrganizerID] = contact
-	}
-
-	for _, stop := range tourStops {
-		stopsByTourID[stop.TourID] = append(stopsByTourID[stop.TourID], stop)
-
-		if stop.Type == "gig" {
-			contactsByTourID[stop.TourID] = append(contactsByTourID[stop.TourID], contactsByOrganizerID[*stop.OrganizerID])
-		}
-	}
-
-	for i := range tours {
-		tours[i].Stops = stopsByTourID[tours[i].ID]
-	}
-
-	for i := range tours {
-		for j := range tours[i].Stops {
-			if tours[i].Stops[j].OrganizerID != nil {
-				tours[i].Contacts = contactsByTourID[*tours[i].Stops[j].OrganizerID]
-			}
-		}
+	if err := s.populateTours(ctx, user.ID, tours); err != nil {
+		return nil, err
 	}
 
 	return tours, nil
 }
 
 func (s *TourService) Read(ctx context.Context, tourID int64) (model.Tour, error) {
+	user, ok := m.UserFromContext(ctx)
+	if !ok {
+		return model.Tour{}, fmt.Errorf("get user from context")
+	}
+
 	tour, err := s.repository.Read(ctx, s.repository.DB, tourID)
 	if err != nil {
 		return model.Tour{}, convertToServiceError("read", "tour", err)
 	}
 
-	tour.Stops, err = s.repository.ReadTourStopsByTourID(ctx, s.repository.DB, tourID)
-	if err != nil {
-		return model.Tour{}, convertToServiceError("read", "tour_stops by tourID", err)
+	tours := []model.Tour{tour}
+	if err := s.populateTours(ctx, user.ID, tours); err != nil {
+		return model.Tour{}, err
 	}
 
-	return tour, nil
+	return tours[0], nil
 }
 
 func (s *TourService) Update(ctx context.Context, tourID int64, update model.TourUpdate) (model.Tour, error) {
+	user, ok := m.UserFromContext(ctx)
+	if !ok {
+		return model.Tour{}, fmt.Errorf("get user from context")
+	}
+
 	if err := validation.ValidateTourUpdate(update); err != nil {
 		return model.Tour{}, err
 	}
@@ -174,7 +149,7 @@ func (s *TourService) Update(ctx context.Context, tourID int64, update model.Tou
 
 		missingDates, err := getMissingDates(existingDates, *update.Start, *update.End)
 		if err != nil {
-			return model.Tour{}, fmt.Errorf("get missing dates: %w")
+			return model.Tour{}, fmt.Errorf("get missing dates: %w", err)
 		}
 
 		if len(missingDates) > 0 {
@@ -190,16 +165,16 @@ func (s *TourService) Update(ctx context.Context, tourID int64, update model.Tou
 		return model.Tour{}, convertToServiceError("update", "tour", err)
 	}
 
-	tour.Stops, err = s.repository.ReadTourStopsByTourID(ctx, tx, tourID)
-	if err != nil {
-		return model.Tour{}, convertToServiceError("read", "tour_stops by tourID", err)
-	}
-
 	if err := tx.Commit(); err != nil {
-		return model.Tour{}, fmt.Errorf("commit transaction")
+		return model.Tour{}, fmt.Errorf("commit transaction: %w", err)
 	}
 
-	return tour, nil
+	tours := []model.Tour{tour}
+	if err := s.populateTours(ctx, user.ID, tours); err != nil {
+		return model.Tour{}, err
+	}
+
+	return tours[0], nil
 }
 
 func (s *TourService) Delete(ctx context.Context, tourID int64, force bool) error {
@@ -227,4 +202,56 @@ func (s *TourService) Delete(ctx context.Context, tourID int64, force bool) erro
 	}
 
 	return tx.Commit()
+}
+
+func (s *TourService) populateTours(ctx context.Context, userID int64, tours []model.Tour) error {
+	tourStops, err := s.repository.ReadAllTourStopsByUserID(ctx, s.repository.DB, userID)
+	if err != nil {
+		return convertToServiceError("populate", "tour_stops by user ID", err)
+	}
+
+	contacts, err := s.repository.ReadAllContactsByUserID(ctx, s.repository.DB, userID)
+	if err != nil {
+		return convertToServiceError("populate", "contacts by user ID", err)
+	}
+
+	contactsByOrganizerID := make(map[int64][]model.Contact)
+	for _, c := range contacts {
+		contactsByOrganizerID[c.OrganizerID] = append(contactsByOrganizerID[c.OrganizerID], c)
+	}
+
+	stopsByTourID := make(map[int64][]model.TourStop)
+	for _, stop := range tourStops {
+		stopsByTourID[stop.TourID] = append(stopsByTourID[stop.TourID], stop)
+	}
+
+	for i := range tours {
+		tours[i].Stops = stopsByTourID[tours[i].ID]
+		tours[i].Contacts = nil
+		tours[i].ConfirmedGigs = 0
+
+		seen := make(map[int64]bool)
+		for _, stop := range tours[i].Stops {
+			if stop.Type != "gig" || stop.OrganizerID == nil {
+				continue
+			}
+			id := *stop.OrganizerID
+
+			// count per gig: two gigs at the same organizer count twice
+			for _, c := range contactsByOrganizerID[id] {
+				if c.Status == "confirmed" {
+					tours[i].ConfirmedGigs++
+					break
+				}
+			}
+
+			if seen[id] {
+				continue
+			}
+			seen[id] = true
+			tours[i].Contacts = append(tours[i].Contacts, contactsByOrganizerID[id]...)
+		}
+	}
+
+	return nil
 }
